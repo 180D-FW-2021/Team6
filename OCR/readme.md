@@ -1,4 +1,6 @@
-To run the web appstreamlit run webapp_ocr.py
+To run the web app
+
+`streamlit run webapp_ocr.py`
 
 Current files: 
 print_ocr.py -- prints text to console using EasyOCR 
