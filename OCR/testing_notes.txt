@@ -1,0 +1,16 @@
+Testing notes - khoa
+
+More accurate when running
+print_ocr.py and detailed_ocr.py
+
+Less accurate when uploading images to web app version (webapp_ocr.py)
+
+detailed_ocr.py gives you details about coordinates and error rate
+print_ocr.py just prints line by line
+
+To run web app:
+streamlit run webapp_ocr.py
+
+Testing Notes:
+bad at hand written text
+accurate for clear pictures/ computer text
