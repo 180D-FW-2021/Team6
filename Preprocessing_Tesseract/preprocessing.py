@@ -61,7 +61,7 @@ thresh, im_bw = cv2.threshold(gray_image, 210, 230, cv2.THRESH_BINARY)
 cv2.imwrite("bw_image.jpg", im_bw)
 display("bw_image.jpg")
 
-print_func("Back and white: ", gray_image)
+print_func("Black and white: ", gray_image)
 
 
 ## Noise Removal
