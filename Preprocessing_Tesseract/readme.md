@@ -1,4 +1,4 @@
-Preprocessing with Pytesseract
+#Preprocessing with Pytesseract
 
 Noise removal
 
