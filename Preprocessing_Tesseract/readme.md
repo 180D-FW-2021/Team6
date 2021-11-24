@@ -1,19 +1,18 @@
-#Preprocessing with Pytesseract
+# Preprocessing with Pytesseract
 
-Noise removal
+*Noise removal*
 
-Dilated image
+*Dilated image*
 
-Black and white
+*Black and white*
 
-Khoa: 
+
+Khoa on my side: 
  
-on my side: 
- 
-team6.png prints for all cases
+**team6.png** prints for all cases
 
-page.png works, only prints for noise removal and thick font case
+**page.png** works, only prints for noise removal and thick font case
 
-testimage works, prints for all cases
+**testimage.jpg** works, prints for all cases
 
 Pretty accurate results after noise_removal, bit more acccurate than thick font version
