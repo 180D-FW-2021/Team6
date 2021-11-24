@@ -16,4 +16,4 @@ PytesseractTest.py --- webcam, text recognition using webcam
 EasyOCR code (print text to console, and also show coordinates and success rate (detailed_ocr.py) Pytesseract simple code print text to console, with simple preprocessing that helps sometimes) 
 
 
-To do: More advanced preprocessing to use along with Pytesseract
+To do: More advanced preprocessing to use along with Pytesseract (see Preprocessing_Tesseract folder)
