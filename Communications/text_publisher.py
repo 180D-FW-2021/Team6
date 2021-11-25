@@ -44,8 +44,9 @@ client.loop_start()
 
 # 5. use publish() to publish messages to the broker.
 # payload must be a string, bytearray, int, float or None.
-for i in range(10):
-	client.publish('ece180d/text', float(np.random.random(1)), qos=1)
+text = 'My very photogenic mother died in a freak accident (picnic, lightning) when I was three, and, save for a pocket of warmth in the darkest past, nothing of her subsists within the hollows and dells of memory, over which, if you can still stand my style (I am writing under observation), the sun of my infancy had set: surely, you all know those redolent remnants of day suspended, with the midges, about some hedge in bloom or suddenly entered and traversed by the rambler, at the bottom of a hill, in the summer dusk; a furry warmth, golden midges.'
+
+client.publish('ece180d/text', text, qos=1)
 
 # 6. use disconnect() to disconnect from the broker.
 client.loop_stop()
