@@ -1,4 +1,4 @@
-from gpiozero import Motor, Servo
+from gpiozero import Motor, Servo, LED
 from time import sleep
 
 # pageturn_right / backwards hardware is not yet implemented
@@ -22,17 +22,20 @@ def pageturn_forward():
 	servo.min()
 
 def init():
-	global servo, motor
+	global servo, motor, led
 	servo = Servo(17)
 	motorF = Motor(18, 27)
+	led = LED(7)
 	# motorB = Motor(5, 6)
 
 def main():
-	if (left):
-		pageturn_forward()
+	led.on()
+	while(1):
+		if (left):
+			pageturn_forward()
 	
-	if (right):
-		pageturn_backwards()
+		if (right):
+			pageturn_backwards()
 
 
 if __name__=='__main__':
