@@ -110,7 +110,6 @@ def on_message(client, userdata, message):
     text_file = open("sample.txt","wt")
     n = text_file.write('Received message: "' + str(message.payload) + '"on topic "' + message.topic + '" with QoS ' + str(message.qos))
     text_file.close()
-    print("test")
     #sampletextfile = open(sys.argv[1], "r")
     sampletextfile = open("sample.txt", "r")
     sampleText = sampletextfile.read()
