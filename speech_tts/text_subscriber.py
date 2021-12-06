@@ -8,6 +8,7 @@ import pygame
 def read(engine, already_processed, sample_text):
 	outfile = "temp.wav"
 	if not already_processed:
+		engine.setProperty('rate', 100)
 		engine.save_to_file(sample_text, outfile)
 		engine.runAndWait()
 	pygame.mixer.music.load(outfile)
@@ -113,9 +114,7 @@ def on_message(client, userdata, message):
     #sampletextfile = open(sys.argv[1], "r")
     sampletextfile = open("sample.txt", "r")
     sampleText = sampletextfile.read()
-    speech_and_text(sampleText)
-
-	
+    speech_and_text(sampleText)	
 
 def main():
     # 1. create a client instance.

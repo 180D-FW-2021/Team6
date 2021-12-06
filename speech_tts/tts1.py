@@ -18,6 +18,7 @@ import pygame
 def read(engine, already_processed, sample_text):
 	outfile = "temp.wav"
 	if not already_processed:
+		engine.setProperty('rate', 100)
 		engine.save_to_file(sample_text, outfile)
 		engine.runAndWait()
 	pygame.mixer.music.load(outfile)
