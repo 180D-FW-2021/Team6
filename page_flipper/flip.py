@@ -1,6 +1,5 @@
-from gpiozero import Motor, Servo, LED
+from gpiozero import Motor, AngularServo, LED
 from time import sleep
-from rpi_hardware_pwm import HardwarePWM
 
 servo=None
 motorF=None
@@ -22,17 +21,22 @@ def pageturn_backwards():
 
 def pageturn_forward():
     motorF.forward(0.5)
-    sleep(0.3)
+    sleep(0.6)
     motorF.stop()
-    servo.change_duty_cycle(100)
-    sleep(0.1)
-    servo.change_duty_cycle(0)
+    servo.angle = 180
+    sleep(1)
+    servo.angle = 0
+    sleep(1)
+    servo.max()
     print('turning page forward')
 
 def init():
     global servo, motorF, led
-    servo = HardwarePWM(0, hz=60)
-    servo.start(0)
+    #servo = HardwarePWM(0, hz=60)
+    #servo.start(0)
+    servo = AngularServo(18, min_angle=0, max_angle=180, min_pulse_width=0.0006, max_pulse_width=0.0024)
+    servo.angle = 180
+    sleep(1)
     motorF = Motor(17, 27)
     led = LED(7)
     print( 'hardware initialized' )
@@ -48,4 +52,3 @@ def main():
 
 if __name__=='__main__':
         main()
-
