@@ -17,9 +17,9 @@ def convert(img):
 
 def process():
     img = cv2.imread('handwriting.jpg')   
-    img = grayscale(img)
-    img = threshold(img)
-    img = noise_removal(img)
+    #img = grayscale(img)
+    #img = threshold(img)
+    #img = noise_removal(img)
     #cv2.imwrite("processed_image.png",img)
     #cv2.imshow('window',test)
     print(convert(img))
