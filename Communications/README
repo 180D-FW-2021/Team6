@@ -1,9 +1,10 @@
 All Files use paho.mqtt which can be downloaded with pip install paho-mqtt
 
 Gesture control publisher and subscriber: 
-
-
 Text publisher and subscriber:
+Both file types are very much the same in testing the mqtt ability to send text between 2 users.  
+
+To use run start the subscriber then the publisher to send data between. 
 
 
 Sources: 
