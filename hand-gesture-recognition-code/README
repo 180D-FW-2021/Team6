@@ -1,1 +1,7 @@
+Files: 
+TechVidvan-hand_gesture_detection.py: pre trained model that we used to detect hand pose estimation. 
+gesture.names: The different gesture names that the pre trained model had.  We had to filter most of them out to be able to use the ones we needed for this project. 
+
+Sources: 
+https://techvidvan.com/tutorials/hand-gesture-recognition-tensorflow-opencv/
 
