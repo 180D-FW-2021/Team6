@@ -18,7 +18,7 @@ Bugs (Khoa on my side) :
 Pretty accurate results after noise_removal, bit more acccurate than thick font version
 
 Bugs (Josh side):
-**Preprocessing does not work when using a live taken image
+Preprocessing does not work when using a live taken image
 
 Files:
 
