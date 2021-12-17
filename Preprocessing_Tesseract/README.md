@@ -17,6 +17,9 @@ Bugs (Khoa on my side) :
 
 Pretty accurate results after noise_removal, bit more acccurate than thick font version
 
+Bugs (Josh side):
+**Preprocessing does not work when using a live taken image
+
 Files:
 
 preprocessing.py --- takes image as input, and does preprocessing three ways as described above, and does OCR text recognition for each preprocessed image. The preprocessed images are saved to the computer.
