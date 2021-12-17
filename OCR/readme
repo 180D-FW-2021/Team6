@@ -29,3 +29,8 @@ Bugs: Integration with MQTT, the text strings sent would have extra characters s
 Future Improvements: Increase accuracy with preprocessing that is also integrated with other modules.
 
 
+Sources:
+https://github.com/UB-Mannheim/tesseract/wiki
+https://www.youtube.com/watch?v=JkzFjj2hjtw
+https://github.com/amrrs/image-to-text-python-app/
+https://github.com/kevinam99/capturing-images-from-webcam-using-opencv-python
