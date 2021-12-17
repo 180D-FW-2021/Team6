@@ -1,0 +1,7 @@
+# speech_tts
+
+tts1.py --- takes a textfile input, and tts is used to read the text out or pause, stop, etc
+
+text_subscriber.py --- tts and MQTT integration, OCR translated text is sent as txt file, and user can use speech commands to read them out , pause, stop, etc.
+
+Bugs: OCR translated text sent includes extra characters that when read out is confusing, as the text is of forms such as \n \e, etc
