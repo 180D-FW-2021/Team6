@@ -1,3 +1,5 @@
+```OCR```
+
 To run the web app
 
 `streamlit run webapp_ocr.py`
