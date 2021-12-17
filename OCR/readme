@@ -1,0 +1,29 @@
+To run the web app
+
+`streamlit run webapp_ocr.py`
+upload the images, and conversion will start.
+
+Current files: 
+print_ocr.py -- prints text to console using EasyOCR 
+
+detailed_ocr.py -- prints text to console with coordinates and success rate usng EasyOCR 
+
+pytesseract_simple.py -- prints text to console 
+
+webapp_ocr.py --- user can upload image to webapp then EasyOCR is used to print the text out
+
+PytesseractTest.py --- webcam, text recognition using webcam using Pytesseract
+
+print_ocr.py --- code (print text to console, and also show coordinates and success rate (detailed_ocr.py) Pytesseract simple code print text to console, with simple preprocessing that helps sometimes) 
+
+.png, .jpeg, .jpg --- sample images to test with the following 
+
+To do: More advanced preprocessing to use along with Pytesseract (see **Preprocessing_Tesseract** folder)
+
+Decisions: We will use Pytesseract, because it runs quicker on the raspberrypi and devices that are more CPU dependent. 
+
+Bugs: Integration with MQTT, the text strings sent would have extra characters such as \n that need to be stripped off.
+
+Future Improvements: Increase accuracy with preprocessing that is also integrated with other modules.
+
+
