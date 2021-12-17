@@ -1,13 +1,21 @@
 # Team6
 
 Folders: 
+
 Communications: Mqtt connection files 
+
 OCR: Pytesseract OCR testing files 
+
 Preprocessing_Tesseract: adding preprocessing to pytesseract
+
 Tesseract: Pytesseract test code with webcam 
+
 Hand-gesture-recognition-code: Gesture pre trained library
+
 imu: gesture control with imu 
+
 Page_flipper: code for page flipper 
+
 Speech_tts: Text to speech code 
 
 How to run readme: 
