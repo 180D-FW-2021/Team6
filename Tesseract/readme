@@ -1,0 +1,4 @@
+webcam and pytesseract simple program.Takes picture with webcam, and OCR is used to output the text.
+
+Sources:
+https://github.com/kevinam99/capturing-images-from-webcam-using-opencv-python
