@@ -26,7 +26,11 @@ def on_message(client, userdata, message):
 	print('Received message: "' + str(message.payload) + '" on topic "' +
 	message.topic + '" with QoS ' + str(message.qos))
 
-
+# Camera section of the code 
+# Once the camera is showing the in the terminal position the camera over the text that you want taken
+# press 's' to take the picture
+# Press 'q' to quit out 
+# You can take an infinite amount of photos than can be taken
 while True:
     key = cv2. waitKey(1)
     webcam = cv2.VideoCapture(1)
@@ -73,9 +77,10 @@ while True:
             cv2.destroyAllWindows()
             break
 
-
+    # Take the saved image and send to ocr pytesseract function to process 
     img = cv2.imread('saved_img.jpg')
-
+	
+    # save the processed text in 'text' to send with mqtt
     text = pytesseract.image_to_string(img)
     print(text)
 
