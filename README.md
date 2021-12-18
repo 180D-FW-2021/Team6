@@ -6,6 +6,8 @@ Communications: Mqtt connection files
 
 OCR: Pytesseract OCR testing files 
 
+Multiprocessing: multiprocessing skeleton and file that integrates concurrent speech recognition and pose recognition tasks 
+
 Preprocessing_Tesseract: adding preprocessing to pytesseract
 
 Tesseract: Pytesseract test code with webcam 
@@ -13,6 +15,8 @@ Tesseract: Pytesseract test code with webcam
 Hand-gesture-recognition-code: Gesture pre trained library
 
 imu: gesture control with imu 
+
+IMUGestureControl: code for sampling gesture data, Tensorflow Lite model training, and classifying for imu gesture control
 
 Page_flipper: code for page flipper 
 
