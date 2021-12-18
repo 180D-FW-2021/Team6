@@ -1,0 +1,14 @@
+Files: 
+laptop.py - Working version of user interface on the laptop end, integrating concurrent text and speech recognition
+multiprocessingskeleton.py - Skeleton code for integration of concurrent tasks 
+
+
+To run:
+-Python3 supported. 
+-Install required python libraries in hand-gesture-recognition-code and speech_tts folders. 
+-In laptop.py, include a path to the mp_hand_gestures folder and gesture.names file from the hand-gesture-recognition-code folder 
+-Run: python laptop.py 
+
+Bugs: Performing poses before initially issuing voice commands crashes the program, caused by the shared variable between the two concurrent tasks. 
+
+Improvements: Fix shared variable problem by utilizing mutex/semaphore. 
