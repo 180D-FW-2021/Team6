@@ -1,0 +1,7 @@
+Files: 
+IMU_Sample.ino - Arduino script that collect samples of various gestures 
+IMU_Classifier.ino - Arduino script that classifies gestures and advertises classified gesture via BLE
+arduino_tinyml_workshop.ipynb - Python notebook we used to train Tensorflow Lite model. 
+
+Sources: 
+https://blog.tensorflow.org/2019/11/how-to-get-started-with-machine.html
