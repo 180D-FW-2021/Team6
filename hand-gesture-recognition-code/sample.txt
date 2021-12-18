@@ -1,1 +1,0 @@
-Received message: "b'    \n   \n\nJ SUCH THAT IT\n, WILL WORK-\n\x0c'"on topic "ece180d/text" with QoS 1
