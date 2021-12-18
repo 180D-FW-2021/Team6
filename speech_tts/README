@@ -14,3 +14,9 @@ Sources:
 https://pypi.org/project/pyttsx3/
 https://www.pygame.org/docs/
 https://stackoverflow.com/questions/65730317/how-to-pause-resume-and-stop-pyttsx3-from-speaking
+https://github.com/Uberi/speech_recognition
+
+Testing Code Sources: 
+https://docs.python.org/3/library/timeit.html
+https://stackoverflow.com/questions/24812253/how-can-i-capture-return-value-with-python-timeit-module
+https://www.lipsum.com/
