@@ -1,3 +1,6 @@
+Folder is DEPRECATED - kept for history purposes
+
+BerryIMU README: 
 This program  reads the angles from the acceleromter, gyrscope
 and mangnetometer on a BerryIMU connected to a Raspberry Pi.
 
