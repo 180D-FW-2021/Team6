@@ -2,6 +2,9 @@ Files:
 TechVidvan-hand_gesture_detection.py: pre trained model that we used to detect hand pose estimation. 
 gesture.names: The different gesture names that the pre trained model had.  
 
+How to install: 
+pip install mediapipe 
+pip install --upgrade tensorflow
 Bugs: Since the model had a lot of already pretrained gestures we had to filter most of them out to be able to use the ones we needed for this project.
 
 Future Improvements: Continue to improve accuracy of the gestures that produced by the users. 
