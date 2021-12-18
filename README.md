@@ -22,5 +22,11 @@ Page_flipper: code for page flipper
 
 Speech_tts: Text to speech code 
 
-How to run readme: 
-Start the file in the Multiprocessing folder then start the PytesseractTest.py file in OCR folder to take the picture of the image.  To take the picture press 's' and press 'q' to exit. Once the text is processed and sent say start in the file to start the text reading.  You can then use your voice to start and stop. Can also you hand gestures thumbs up and hand up to start and stop.  The imu is controlled with the file in the page flipper folder that will flip the page when the voice is finished reading.  
+How to run project: 
+- Start the "laptop.py" file in the Multiprocessing folder on user's laptop. 
+- After mounting textbook under camera/webcam, start the PytesseractTest.py file in OCR folder to take the picture of the image.  To take a picture, press 's' and press 'q' to exit. 
+- Upload the "IMU_Classifier.ino" file in the IMUGestureControl folder to your Arduino 33 BLE Sense to enable IMU gesture control. 
+- Upload the "esp_flip.ino" file in the page_flipper folder to your ESP32 to enable page flipping.
+- Once text has is processed, say "start" into user's laptop's microphone to begin the text reading.  
+- Use "start", "stop" voice commands or thumbs up and hand up to start and stop the text reading.  
+- Once the reading is done, shake the Arduino 33 BLE Sense controller right or left to enable robotic page flipping to begin reading the next page.
