@@ -1,5 +1,7 @@
 Files: 
-esp_flip.ino: used for page flipper
+esp_flip.ino: used for page flipper with ESP32 DevKit-C
+Alternatively, you can use the flip.py script for Raspberry Pi. 
+  The mock_flip_commands.py test script for Raspberry Pi takes in console input ( 'f' ) and turns wheel forward accordingly.
 
 Bugs: 
 Issues with inconsistency of page flipper as it does not always flip the page correctly. 
