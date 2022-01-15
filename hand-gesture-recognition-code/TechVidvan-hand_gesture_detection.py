@@ -18,6 +18,7 @@ counter = 0
 pose = None
 
 def init():
+    global mpHands, hands, mpDraw, model, classNames, cap, counter, pose
     # initialize mediapipe
     mpHands = mp.solutions.hands
     hands = mpHands.Hands(max_num_hands=1, min_detection_confidence=0.7)
@@ -39,6 +40,7 @@ def init():
     pose = "" 
 
 def loop():
+    global mpHands, hands, mpDraw, model, classNames, cap, counter, pose
     while True:
         # Read each frame from the webcam
         _, frame = cap.read()
@@ -98,6 +100,7 @@ def loop():
             break
 
 def cleanup():
+    global cap
     # release the webcam and destroy all active windows
     cap.release()
     
