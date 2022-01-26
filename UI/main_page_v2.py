@@ -116,7 +116,7 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "Optical Character Recognition"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "README"))
         scriptDir = os.path.dirname(os.path.realpath(__file__))
         MainWindow.setWindowIcon(QtGui.QIcon(scriptDir + os.path.sep + 'ocrLogo.png'))
         self.buttonGetImage.setText(_translate("MainWindow", "Load image"))
