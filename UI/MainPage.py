@@ -9,10 +9,14 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-#import os , re , cv2 , pytesseract
-#from PyQt5.QtGui import  QIcon ,QPixmap 
+import os , re , cv2 , pytesseract
+from PyQt5.QtGui import  QIcon ,QPixmap 
 
 class Ui_MainWindow(object):
+    
+    def __init__(self):
+        pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
+
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(800, 600)
@@ -78,6 +82,44 @@ class Ui_MainWindow(object):
             "MainWindow", "This is a testing area to see if the text is going to wrap in the proper way and what is going on in this part of the code "))
         self.label_3.setText(_translate("MainWindow", "WEBCAM AREA"))
 
+    def getImage(self):
+        options = QtWidgets.QFileDialog.Options()
+        options |= QtWidgets.QFileDialog.DontUseNativeDialog
+        self.fileName, _ = QtWidgets.QFileDialog.getOpenFileName(options=options)
+        # self.fileName, _ = QtWidgets.QFileDialog.getOpenFileName(self,"Open a image", "","All Files (*);;Image Files (*.jpg);;Image Files (*.png)", options=options)
+        if self.fileName:
+            print(self.fileName)
+            pattern = ".(jpg|png|jpeg|bmp|jpe|tiff)$"
+            if re.search(pattern,self.fileName):
+                self.setImage(self.fileName)
+
+    def setImage(self,fileName):
+        self.labelImage.setPixmap(QPixmap(fileName))
+        self.buttonExtractText.setEnabled(True)
+    
+    def extractText(self):
+        config = ('-l eng --oem 1 --psm 3')
+        img = cv2.imread(self.fileName, cv2.IMREAD_COLOR)
+        # Run tesseract OCR on image
+        text = pytesseract.image_to_string(img, config=config)
+        # Print recognized text
+        self.textEdit.append(text)
+        print(text)
+
+    def clearText(self):
+        self.textEdit.clear()
+
+    def saveText(self):
+        options = QtWidgets.QFileDialog.Options()
+        options |= QtWidgets.QFileDialog.DontUseNativeDialog
+        # fileName, _ = QtWidgets.QFileDialog.getSaveFileName(self,"Save text","All Files (*);;Text Files (*.txt)", options=options)
+        fileName, _ = QtWidgets.QFileDialog.getSaveFileName(options=options)
+        if fileName:
+            print(fileName)
+            file = open(fileName,'w')
+            text = self.textEdit.toPlainText()
+            file.write(text)
+            file.close()
 
 if __name__ == "__main__":
     import sys
