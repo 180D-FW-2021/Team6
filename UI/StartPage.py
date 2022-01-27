@@ -9,9 +9,19 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+from main_page_v2 import Ui_MainWindow
+from PyQt5.QtWidgets import *
 
 
 class Ui_MainWindow2(object):
+
+    def openWindow(self):
+        global flag
+        self.window = QtWidgets.QMainWindow()
+        self.ui = Ui_MainWindow()
+        self.ui.setupUi(self.window)
+        self.window.show()
+
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(800, 600)
@@ -20,6 +30,7 @@ class Ui_MainWindow2(object):
         self.Start = QtWidgets.QPushButton(self.centralwidget)
         self.Start.setGeometry(QtCore.QRect(280, 330, 241, 131))
         self.Start.setObjectName("Start")
+        self.Start.clicked.connect(self.openWindow)
         self.label = QtWidgets.QLabel(self.centralwidget)
         self.label.setGeometry(QtCore.QRect(330, 120, 281, 111))
         self.label.setText("")
@@ -46,6 +57,7 @@ class Ui_MainWindow2(object):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
         self.Start.setText(_translate("MainWindow", "START"))
+
         self.README.setText(_translate("MainWindow", "README"))
 
 

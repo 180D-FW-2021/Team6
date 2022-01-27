@@ -12,7 +12,7 @@ import os
 import re
 import cv2
 import pytesseract
-from StartPage import Ui_MainWindow2
+#from StartPage import Ui_MainWindow2
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtGui import QIcon, QPixmap
 
@@ -25,11 +25,11 @@ class Ui_MainWindow(object):
     def __init__(self):
         pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
 
-    def openWindow(self):
-        self.window = QtWidgets.QMainWindow()
-        self.ui = Ui_MainWindow2()
-        self.ui.setupUi(self.window)
-        self.window.show()
+    # def openWindow(self):
+    #     self.window = QtWidgets.QMainWindow()
+    #     self.ui = Ui_MainWindow2()
+    #     self.ui.setupUi(self.window)
+    #     self.window.show()
 
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
@@ -141,7 +141,7 @@ class Ui_MainWindow(object):
         self.buttonSave.setText(_translate("MainWindow", "Save text"))
         # TO DO
         self.pushButton_3.setText(_translate("MainWindow", "Instructions"))
-        self.pushButton_3.clicked.connect(self.openWindow)
+      #  self.pushButton_3.clicked.connect(self.openWindow)
         self.pushButton_4.setText(_translate("MainWindow", "Exit"))
         self.pushButton_4.clicked.connect(closeIt)
         self.pushButton_5.setText(_translate("MainWindow", "Options"))
