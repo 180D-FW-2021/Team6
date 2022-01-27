@@ -21,6 +21,7 @@ then
     pip install mediapipe
     pip install --upgrade tensorflow
     pip install paho-mqtt
+    pip install pywin32
     '''
 
 fi
