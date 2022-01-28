@@ -11,6 +11,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
+from Instructions_Pop_up import Ui_MainWindow
 
 
 class VideoThread(QThread):
@@ -41,7 +42,7 @@ class App(QWidget):
     def __init__(self):
         super().__init__()
         pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
-        self.setWindowTitle("Qt live label demo")
+        self.setWindowTitle("READEME")
         self.resize(3000, 3000)
 
         # Image area ---------------------------------------------------
@@ -108,6 +109,7 @@ class App(QWidget):
         self.Instructions.setGeometry(QtCore.QRect(30, 810, 171, 41))
         self.Instructions.resize(200, 50)
         self.Instructions.setFont(QFont('Times', 15))
+        self.Instructions.clicked.connect(self.openWindow)
 
         self.Exit = QPushButton("Exit", self)
         self.Exit.setObjectName("Exit")
@@ -117,15 +119,6 @@ class App(QWidget):
         self.Exit.clicked.connect(self.close)
 
         # Buttons ------------------------------------------------------------
-
-        # Savebutton.setFont(10, QFont)
-
-        # # create a vertical box layout and add the two labels
-        # vbox = QVBoxLayout()
-        # vbox.addWidget(self.Webcam)
-        # vbox.addWidget(self.textLabel)
-        # # set the vbox layout as the widgets layout
-        # self.setLayout(vbox)
 
     def closeEvent(self, event):
         self.thread.stop()
@@ -190,6 +183,12 @@ class App(QWidget):
             text = self.textEdit.toPlainText()
             file.write(text)
             file.close()
+
+    def openWindow(self):
+        self.window = QtWidgets.QMainWindow()
+        self.ui = Ui_MainWindow()
+        self.ui.setupUi(self.window)
+        self.window.show()
 
 
 if __name__ == "__main__":
