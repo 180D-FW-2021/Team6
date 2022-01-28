@@ -1,13 +1,11 @@
 
 from PyQt5 import QtGui
-
 import pytesseract
 import sys
 import cv2
 import re
 import numpy as np
 from PyQt5 import QtCore, QtGui, QtWidgets
-
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
