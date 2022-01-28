@@ -17,7 +17,7 @@ cap = None
 counter = 0
 pose = None
 
-def init():
+def init(path):
     global mpHands, hands, mpDraw, model, classNames, cap, counter, pose
     # initialize mediapipe
     mpHands = mp.solutions.hands
@@ -25,10 +25,10 @@ def init():
     mpDraw = mp.solutions.drawing_utils
 
     # Load the gesture recognizer model
-    model = load_model('mp_hand_gesture')
+    model = load_model(path + '\mp_hand_gesture')
 
     # Load class names
-    f = open('gesture.names', 'r')
+    f = open(path + '\gesture.names', 'r')
     classNames = f.read().split('\n')
     f.close()
     print(classNames)
@@ -106,6 +106,9 @@ def cleanup():
     
     cv2.destroyAllWindows()
 
-init()
-loop()
-cleanup()
+# import os
+# path = os.getcwd()
+# init(path)
+# loop()
+# cleanup()
+
