@@ -40,7 +40,7 @@ class App(QWidget):
     def __init__(self):
         super().__init__()
         pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
-        self.setWindowTitle("README")
+        self.setWindowTitle("Qt live label demo")
         self.resize(3000, 3000)
 
         # Image area ---------------------------------------------------
@@ -86,37 +86,31 @@ class App(QWidget):
         self.Run.setGeometry(QtCore.QRect(30, 660, 171, 41))
         self.Run.resize(200, 50)
         self.Run.setFont(QFont('Times', 15))
+        self.Run.clicked.connect(self.extractText)
 
         self.Clear = QPushButton("Clear", self)
         self.Clear.setObjectName("Clear")
         self.Clear.setGeometry(QtCore.QRect(30, 710, 171, 41))
         self.Clear.resize(200, 50)
         self.Clear.setFont(QFont('Times', 15))
-        self.Clear.clicked.connect(self.getImage)
+        self.Clear.clicked.connect(self.clearText)
 
         self.Save = QPushButton("Save text", self)
         self.Save.setObjectName("Save text")
         self.Save.setGeometry(QtCore.QRect(30, 760, 171, 41))
         self.Save.resize(200, 50)
         self.Save.setFont(QFont('Times', 15))
-        self.Save.clicked.connect(self.close)
+        self.Save.clicked.connect(self.saveText)
 
-        self.Options = QPushButton("Options", self)
-        self.Options.setObjectName("Options")
-        self.Options.setGeometry(QtCore.QRect(30, 810, 171, 41))
-        self.Options.resize(200, 50)
-        self.Options.setFont(QFont('Times', 15))
-
-        self.Instructions = QPushButton("Load", self)
-        self.Instructions.setObjectName("LoadImage")
-        self.Instructions.setGeometry(QtCore.QRect(30, 860, 171, 41))
+        self.Instructions = QPushButton("Instructions", self)
+        self.Instructions.setObjectName("Instructions")
+        self.Instructions.setGeometry(QtCore.QRect(30, 810, 171, 41))
         self.Instructions.resize(200, 50)
         self.Instructions.setFont(QFont('Times', 15))
-        self.Instructions.clicked.connect(self.getImage)
 
         self.Exit = QPushButton("Exit", self)
         self.Exit.setObjectName("Exit")
-        self.Exit.setGeometry(QtCore.QRect(30, 910, 171, 41))
+        self.Exit.setGeometry(QtCore.QRect(30, 860, 171, 41))
         self.Exit.resize(200, 50)
         self.Exit.setFont(QFont('Times', 15))
         self.Exit.clicked.connect(self.close)
@@ -170,7 +164,7 @@ class App(QWidget):
 
     def setImage(self, fileName):
         self.labelImage.setPixmap(QPixmap(fileName))
-        self.buttonExtractText.setEnabled(True)
+        self.Run.setEnabled(True)
 
     def extractText(self):
         config = ('-l eng --oem 1 --psm 3')
@@ -183,6 +177,18 @@ class App(QWidget):
 
     def clearText(self):
         self.textEdit.clear()
+
+    def saveText(self):
+        options = QtWidgets.QFileDialog.Options()
+        options |= QtWidgets.QFileDialog.DontUseNativeDialog
+        # fileName, _ = QtWidgets.QFileDialog.getSaveFileName(self,"Save text","All Files (*);;Text Files (*.txt)", options=options)
+        fileName, _ = QtWidgets.QFileDialog.getSaveFileName(options=options)
+        if fileName:
+            print(fileName)
+            file = open(fileName, 'w')
+            text = self.textEdit.toPlainText()
+            file.write(text)
+            file.close()
 
 
 if __name__ == "__main__":
