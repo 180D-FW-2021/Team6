@@ -1,5 +1,5 @@
-from multiprocessing import Process
 import os
+import threading
 
 import paho.mqtt.client as mqtt
 import pyttsx3
@@ -8,7 +8,7 @@ import time
 import sys
 import pygame
 
-  # TechVidvan hand Gesture Recognizer
+# TechVidvan hand Gesture Recognizer
 
 # import necessary packages
 
@@ -18,94 +18,27 @@ import mediapipe as mp
 import tensorflow as tf
 from tensorflow.keras.models import load_model
 
-sampleText = ""
+# import functions
+from speech_tts import tts1 as speechtts 
+from hand_gesture_recognition_code import TechVidvan_hand_gesture_detection as pose
+# from Communications import gesture_control_subscriber as comms
 
+# global variables
+
+sampleText = ""
 engine = None
 r = None
 m = None
 already_processed = False
+outfile = None
 
-# tts
-def init():
-    global engine, r, m, already_processed
-    pygame.mixer.init()
-    engine = pyttsx3.init()
-    r = sr.Recognizer()
-    m = sr.Microphone()
-    already_processed = False
-    calibrate(r, m)
+process_text_mutex = threading.Lock()
 
-
-def read(sample_text):
-        global engine, r, m, already_processed
-        outfile = "temp.wav"
-        if not already_processed:
-                engine.save_to_file(sample_text, outfile)
-                engine.runAndWait()
-        pygame.mixer.music.load(outfile)
-        pygame.mixer.music.play()
-
-def stop():
-    pygame.mixer.music.stop()
-
-def pause():
-    pygame.mixer.music.pause()
-
-def unpause():
-    pygame.mixer.music.unpause()
-
-def calibrate(r, m):
-        with m as source: 
-                r.adjust_for_ambient_noise(source)
-
-def speech_and_text(sample_text):
-        global engine, r, m
-        
-        while (1):
-                with sr.Microphone() as source:
-                        print("say something!")
-                        time.sleep(1)
-                        audio = r.listen(source)
-                try:
-                        speech = r.recognize_google(audio)
-                        print("You said: " + speech)
-
-                        speech = speech.split()[0]
-                        print("Command given: " + speech)
-
-                        if speech == "start":
-                                phrase = "starting text reading"
-                                print(phrase)
-                                read(sample_text)
-                        elif speech == "stop":
-                                phrase = "stopping text reading"
-                                print(phrase)
-                                pause()
-                        elif speech == "pause":
-                                phrase = "pausing text reading"
-                                print(phrase)
-                                pause()
-                        elif speech == "play":
-                                phrase = "resuming text reading"
-                                print(phrase)
-                                unpause()
-                        # TODO speeding up/down currently not implemented, 
-                        #      complications with the time required to resample the wav file
-                                '''
-                                elif speech == "speed up":
-                                        phrase = "speeding up"
-                                        engine.say(phrase)
-                                        print(phrase)
-                                elif speech == ("slow down"):
-                                        phrase = "slowing down"
-                                        engine.say(phrase)
-                                        print(phrase)
-                                '''
-
-                except sr.UnknownValueError:
-                        print("Google Speech Recognition could not understand audio")
-                except sr.RequestError as e:
-                        print("Error; {0}".format(e))
+def test_text_recognition():
+    global sampleText
+    sampletextfile = open('speech_tts/testing/sampletext1000')
+    sampleText = sampletextfile.read()
+    speechtts.process_text()
 
 # 0. define callbacks - functions that run when events happen.
 # The callback for when the client receives a CONNACK response from the server.
@@ -141,11 +74,43 @@ def on_message(client, userdata, message):
     #sampletextfile = open(sys.argv[1], "r")
     sampletextfile = open("sample.txt", "r")
     sampleText = sampletextfile.read()
-    speech_and_text(sampleText)
+    speechtts.process_text()
+        
+def text_recognition():
+    # 1. create a client instance.
+    client = mqtt.Client()
+    # add additional client options (security, certifications, etc.)
+    # many default options should be good to start off.
+    # add callbacks to client.
+
+    client.on_connect = on_connect
+    client.on_disconnect = on_disconnect
+    client.on_message = on_message
+
+    # 2. connect to a broker using one of the connect*() functions.5
+
+    client.connect_async('mqtt.eclipseprojects.io')
+    # client.connect("mqtt.eclipse.org")
+
+    # 3. call one of the loop*() functions to maintain network traffic flow with the broker.
+    client.loop_start()
+    # client.loop_forever()
+
+    while True:
+        pass
+
+   
+    # use subscribe() to subscribe to a topic and receive messages.
+
+    # use publish() to publish messages to the broker.
+
+    # use disconnect() to disconnect from the broker.
+    client.loop_stop()
+    client.disconnect()
 
 
-
-def main():
+def pose_recognition(path):
+        global engine, r, m, already_processed
         
         # initialize mediapipe
         mpHands = mp.solutions.hands
@@ -153,10 +118,10 @@ def main():
         mpDraw = mp.solutions.drawing_utils
 
         # Load the gesture recognizer model
-        model = load_model('mp_hand_gesture')
+        model = load_model(path + '\hand_gesture_recognition_code\mp_hand_gesture')
 
         # Load class names
-        f = open('gesture.names', 'r')
+        f = open(path + '\hand_gesture_recognition_code\gesture.names', 'r')
         classNames = f.read().split('\n')
         f.close()
         print(classNames)
@@ -167,25 +132,6 @@ def main():
 
         counter = 0 
         pose = "" 
-
-        # 1. create a client instance.
-        client = mqtt.Client()
-        # add additional client options (security, certifications, etc.)
-        # many default options should be good to start off.
-        # add callbacks to client.
-
-        client.on_connect = on_connect
-        client.on_disconnect = on_disconnect
-        client.on_message = on_message
-
-        # 2. connect to a broker using one of the connect*() functions.5
-
-        client.connect_async('mqtt.eclipseprojects.io')
-        # client.connect("mqtt.eclipse.org")
-
-        # 3. call one of the loop*() functions to maintain network traffic flow with the broker.
-        client.loop_start()
-        # client.loop_forever()
 
         while True:
                 # Read each frame from the webcam
@@ -234,10 +180,10 @@ def main():
                 if counter > 5: 
                         if className == 'stop': 
                                 print("stop")
-                                pause()
+                                speechtts.pause()
                         elif className == 'thumbs up':
                                 print("start")
-                                read(sampleText)
+                                speechtts.read()
                         counter = 0
                 if pose == className: 
                         counter = counter + 1 
@@ -252,14 +198,32 @@ def main():
         cap.release()
 
         cv2.destroyAllWindows()
-       
-        # use subscribe() to subscribe to a topic and receive messages.
-
-        # use publish() to publish messages to the broker.
-
-        # use disconnect() to disconnect from the broker.
-        client.loop_stop()
-        client.disconnect()
-        
 
 
+def pose_recognition_mock():
+    while(1):
+        pass
+
+def main():
+    path = os.getcwd()
+    speechtts.init()
+    # pose.init(path)
+
+    print('speech init done')
+
+    t1 = threading.Thread(target=test_text_recognition, args=()) 
+    t2 = threading.Thread(target=speechtts.speech_and_text, args=()) 
+    t3 = threading.Thread(target=pose_recognition, args=(path,)) 
+
+    print('before thread start')
+
+    t1.start()
+    t2.start()
+    t3.start()
+
+    t1.join()
+    t2.join()
+    t3.join()
+
+if __name__ == '__main__':
+    main()
