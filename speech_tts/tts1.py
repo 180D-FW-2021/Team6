@@ -3,6 +3,7 @@ import speech_recognition as sr
 import time
 import sys
 import pygame
+import config
 
 # import pycaw
 #import alsaaudio
@@ -15,19 +16,28 @@ import pygame
 #           i.e. `python tts1.py sampletext.txt`
 
 # references:
-#               https://stackoverflow.com/questions/65730317/how-to-pause-resume-and-stop-pyttsx3-from-speaking
-#               Using this, we will finish processing the text to speech before beginning reading (for now)
+#               https://stackoverflow.com/questions/65730317/how-to-pause-resume-and-stop-pyttsx3-from-sp
+eaking
+#               Using this, we will finish processing the text to speech before beginning reading (for no
+w)
 #   https://stackoverflow.com/questions/20828752/python-change-master-application-volume
 
+'''
 engine = None
 already_processed = None
 r = None
 m = None
 outfile = None
-sampleText = None
+sampleText = "hi hi"
+'''
+
+engine = None
+r = None
+m = None
+
 
 def init():
-    global engine, already_processed, r, m  
+    global engine, r, m  
     if sys.platform == "win32":
         pass
         # import pycaw
@@ -42,31 +52,32 @@ def init():
     r = sr.Recognizer()
     m = sr.Microphone()
     calibrate()
-    already_processed = False
 
 def process_text():
-    global sampleText
-    if sampleText != None:
-        global outfile, engine
-        outfile = "temp.wav"
-        engine.setProperty('rate', 100)
-        engine.save_to_file(sample_text, outfile)
-        engine.runAndWait()
-        print( 'processed text')
-    else:
-        print( 'text already processed')
+    # global config.sampleText
+    while config.sampleText == None:
+        pass
+    global engine
+    config.outfile = "temp.wav"
+    engine.setProperty('rate', 100)
+    engine.save_to_file(config.sampleText, config.outfile)
+    engine.runAndWait()
 
 
 def read():
-    global engine, r, m, already_processed
-    if (outfile !=  None): 
-        pygame.mixer.music.load(outfile)
-        pygame.mixer.music.play()
+    global engine, r, m # , config.outfile, config.sampleText
+    print('read function')
+    if (config.outfile !=  None):
+        if not pygame.mixer.music.get_busy(): # don't restart if file is already playing
+            pygame.mixer.music.load(config.outfile)
+            pygame.mixer.music.play()
 
 def stop():
+    print('stop function')
     pygame.mixer.music.stop()
 
 def pause():
+    print('pause function')
     pygame.mixer.music.pause()
 
 def unpause():
@@ -81,7 +92,7 @@ def calibrate():
         r.adjust_for_ambient_noise(source)
 
 def speech_and_text():
-    global sample_text, engine, r, m, already_processed
+    global engine, r, m
     while (1):
         with sr.Microphone() as source:
             print("say something!")
@@ -96,19 +107,15 @@ def speech_and_text():
 
             if speech == "start":
                 phrase = "starting text reading"
-                print(phrase)
-                read(engine, already_processed, sample_text)
+                read()
             elif speech == "stop":
                 phrase = "stopping text reading"
-                print(phrase)
                 pause()
             elif speech == "pause":
                 phrase = "pausing text reading"
-                print(phrase)
                 pause()
             elif speech == "play":
                 phrase = "resuming text reading"
-                print(phrase)
                 unpause()
             # TODO speeding up/down currently not implemented, 
             #      complications with the time required to resample the wav file
@@ -127,6 +134,7 @@ def speech_and_text():
                 print("Google Speech Recognition could not understand audio")
         except sr.RequestError as e:
                 print("Error; {0}".format(e))
+
 
 def main():
     global sample_text, engine, r, m, already_processed

@@ -18,26 +18,25 @@ import mediapipe as mp
 import tensorflow as tf
 from tensorflow.keras.models import load_model
 
+
+print('after global vars')
+
+print('start function imports')
+
 # import functions
-from speech_tts import tts1 as speechtts 
-from hand_gesture_recognition_code import TechVidvan_hand_gesture_detection as pose
-# from Communications import gesture_control_subscriber as comms
+import config
+import speech_tts.tts1 as speechtts 
+import hand_gesture_recognition_code.TechVidvan_hand_gesture_detection as pose
+# import Communications.gesture_control_subscriber as comms
 
-# global variables
-
-sampleText = ""
-engine = None
-r = None
-m = None
-already_processed = False
-outfile = None
 
 process_text_mutex = threading.Lock()
 
 def test_text_recognition():
-    global sampleText
     sampletextfile = open('speech_tts/testing/sampletext1000')
-    sampleText = sampletextfile.read()
+    process_text_mutex.acquire()
+    config.sampleText = sampletextfile.read()
+    process_text_mutex.release()
     speechtts.process_text()
 
 # 0. define callbacks - functions that run when events happen.
@@ -59,17 +58,10 @@ def on_disconnect(client, userdata, rc):
 
 # The default message callback.
 # (you can create separate callbacks per subscribed topic)
-'''
-    text_file = open("sample.txt","wt")
-    n = text_file.write()
-    sampleText = open(sys.argv[1], "r")
-    #sampleText = sampletextfile.read()
-    speech_and_text(sampleText)
-    print('Received message: "' + str(message.payload) + '"on topic "' + message.topic + '" with QoS ' + str(message.qos))
-'''
 def on_message(client, userdata, message):
     text_file = open("sample.txt","wt")
-    n = text_file.write('Received message: "' + str(message.payload) + '"on topic "' + message.topic + '" with QoS ' + str(message.qos))
+    n = text_file.write('Received message: "' + str(message.payload) + '"on topic "' + \
+            message.topic + '" with QoS ' + str(message.qos))
     text_file.close()
     #sampletextfile = open(sys.argv[1], "r")
     sampletextfile = open("sample.txt", "r")
@@ -110,94 +102,92 @@ def text_recognition():
 
 
 def pose_recognition(path):
-        global engine, r, m, already_processed
         
-        # initialize mediapipe
-        mpHands = mp.solutions.hands
-        hands = mpHands.Hands(max_num_hands=1, min_detection_confidence=0.7)
-        mpDraw = mp.solutions.drawing_utils
+    # initialize mediapipe
+    mpHands = mp.solutions.hands
+    hands = mpHands.Hands(max_num_hands=1, min_detection_confidence=0.7)
+    mpDraw = mp.solutions.drawing_utils
 
-        # Load the gesture recognizer model
-        model = load_model(path + '\hand_gesture_recognition_code\mp_hand_gesture')
+    # Load the gesture recognizer model
+    model = load_model(path + '\hand_gesture_recognition_code\mp_hand_gesture')
 
-        # Load class names
-        f = open(path + '\hand_gesture_recognition_code\gesture.names', 'r')
-        classNames = f.read().split('\n')
-        f.close()
-        print(classNames)
+    # Load class names
+    f = open(path + '\hand_gesture_recognition_code\gesture.names', 'r')
+    classNames = f.read().split('\n')
+    f.close()
+    print(classNames)
 
 
-        # Initialize the webcam
-        cap = cv2.VideoCapture(0)
+    # Initialize the webcam
+    cap = cv2.VideoCapture(0)
 
-        counter = 0 
-        pose = "" 
+    counter = 0 
+    pose = "" 
 
-        while True:
-                # Read each frame from the webcam
-                _, frame = cap.read()
-                        
-                x, y, c = frame.shape
-                        
-                # Flip the frame vertically
-                frame = cv2.flip(frame, 1)
-                framergb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-                        
-                # Get hand landmark prediction
-                result = hands.process(framergb)
-                        
-                # print(result)
+    while True:
+        # Read each frame from the webcam
+        _, frame = cap.read()
                 
-                className = ''
+        x, y, c = frame.shape
+                
+        # Flip the frame vertically
+        frame = cv2.flip(frame, 1)
+        framergb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                
+        # Get hand landmark prediction
+        result = hands.process(framergb)
+                
+        # print(result)
+        
+        className = ''
+                
+        # post process the result
+        if result.multi_hand_landmarks:
+            landmarks = []
+            for handslms in result.multi_hand_landmarks:
+                for lm in handslms.landmark:
+                    # print(id, lm)
+                    lmx = int(lm.x * x)
+                    lmy = int(lm.y * y)
+
+                    landmarks.append([lmx, lmy])
+
+                # Drawing landmarks on frames
+                mpDraw.draw_landmarks(frame, handslms, mpHands.HAND_CONNECTIONS)
+                
+                # Predict gesture
+                prediction = model.predict([landmarks])
+                # print(prediction)
+                classID = np.argmax(prediction)
+                className = classNames[classID]
+        
+        # show the prediction on the frame
+        if className == 'stop' or className == 'thumbs up': 
+            cv2.putText(frame, className, (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,0,255), 2, cv2.LINE_A
+A)
+        
+        # Show the final output
+        cv2.imshow("Output", frame)
+        
+        if counter > 5: 
+            if className == 'stop': 
+                    speechtts.pause()
+            elif className == 'thumbs up':
+                    speechtts.read()
+            counter = 0
+        if pose == className: 
+            counter = counter + 1 
+        
+        pose = className 
                         
-                # post process the result
-                if result.multi_hand_landmarks:
-                        landmarks = []
-                        for handslms in result.multi_hand_landmarks:
-                                for lm in handslms.landmark:
-                                        # print(id, lm)
-                                        lmx = int(lm.x * x)
-                                        lmy = int(lm.y * y)
 
-                                        landmarks.append([lmx, lmy])
+        if cv2.waitKey(1) == ord('q'):
+            break
 
-                                # Drawing landmarks on frames
-                                mpDraw.draw_landmarks(frame, handslms, mpHands.HAND_CONNECTIONS)
-                                
-                                # Predict gesture
-                                prediction = model.predict([landmarks])
-                                # print(prediction)
-                                classID = np.argmax(prediction)
-                                className = classNames[classID]
-                
-                # show the prediction on the frame
-                if className == 'stop' or className == 'thumbs up': 
-                        cv2.putText(frame, className, (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,0,255), 2, cv2.LINE_AA)
-                
-                # Show the final output
-                cv2.imshow("Output", frame)
-                
-                if counter > 5: 
-                        if className == 'stop': 
-                                print("stop")
-                                speechtts.pause()
-                        elif className == 'thumbs up':
-                                print("start")
-                                speechtts.read()
-                        counter = 0
-                if pose == className: 
-                        counter = counter + 1 
-                
-                pose = className 
-                                
+    # release the webcam and destroy all active windows
+    cap.release()
 
-                if cv2.waitKey(1) == ord('q'):
-                        break
-
-        # release the webcam and destroy all active windows
-        cap.release()
-
-        cv2.destroyAllWindows()
+    cv2.destroyAllWindows()
 
 
 def pose_recognition_mock():
@@ -205,17 +195,15 @@ def pose_recognition_mock():
         pass
 
 def main():
+    # global config.sampleText
+    
     path = os.getcwd()
     speechtts.init()
     # pose.init(path)
 
-    print('speech init done')
-
     t1 = threading.Thread(target=test_text_recognition, args=()) 
     t2 = threading.Thread(target=speechtts.speech_and_text, args=()) 
     t3 = threading.Thread(target=pose_recognition, args=(path,)) 
-
-    print('before thread start')
 
     t1.start()
     t2.start()
@@ -227,3 +215,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+
