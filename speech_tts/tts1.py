@@ -16,10 +16,8 @@ import config
 #           i.e. `python tts1.py sampletext.txt`
 
 # references:
-#               https://stackoverflow.com/questions/65730317/how-to-pause-resume-and-stop-pyttsx3-from-sp
-eaking
-#               Using this, we will finish processing the text to speech before beginning reading (for no
-w)
+#               https://stackoverflow.com/questions/65730317/how-to-pause-resume-and-stop-pyttsx3-from-speaking
+#               Using this, we will finish processing the text to speech before beginning reading (for now)
 #   https://stackoverflow.com/questions/20828752/python-change-master-application-volume
 
 '''
@@ -63,14 +61,22 @@ def process_text():
     engine.save_to_file(config.sampleText, config.outfile)
     engine.runAndWait()
 
-
 def read():
     global engine, r, m # , config.outfile, config.sampleText
     print('read function')
     if (config.outfile !=  None):
         if not pygame.mixer.music.get_busy(): # don't restart if file is already playing
-            pygame.mixer.music.load(config.outfile)
-            pygame.mixer.music.play()
+            try: 
+                pygame.mixer.music.load(config.outfile)
+                pygame.mixer.music.play()
+            except pygame.error as e:
+                if e.args[0] is not None:
+                    if 'No file' in e.args[0]:
+                        print('temp.wav not yet outputted. try again later')
+                    else:
+                        print(e.message)
+                else:
+                    print(str(e))
 
 def stop():
     print('stop function')

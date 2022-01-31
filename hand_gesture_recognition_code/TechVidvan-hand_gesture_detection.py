@@ -8,6 +8,8 @@ import mediapipe as mp
 import tensorflow as tf
 from tensorflow.keras.models import load_model
 
+import config
+
 mpHands = None
 hands = None
 mpDraw = None
@@ -17,6 +19,7 @@ cap = None
 counter = 0
 pose = None
 
+# path arg is path of Team6 folder
 def init(path):
     global mpHands, hands, mpDraw, model, classNames, cap, counter, pose
     # initialize mediapipe
@@ -25,10 +28,10 @@ def init(path):
     mpDraw = mp.solutions.drawing_utils
 
     # Load the gesture recognizer model
-    model = load_model(path + '\mp_hand_gesture')
+    model = load_model(path + '\hand_gesture_recognition_code\mp_hand_gesture')
 
     # Load class names
-    f = open(path + '\gesture.names', 'r')
+    f = open(path + '\hand_gesture_recognition_code\gesture.names', 'r')
     classNames = f.read().split('\n')
     f.close()
     print(classNames)
@@ -39,7 +42,7 @@ def init(path):
     counter = 0 
     pose = "" 
 
-def loop():
+def loop(read_func=None, pause_func=None):
     global mpHands, hands, mpDraw, model, classNames, cap, counter, pose
     while True:
         # Read each frame from the webcam
@@ -80,16 +83,22 @@ def loop():
         
         # show the prediction on the frame
         if className == 'stop' or className == 'thumbs up': 
-            cv2.putText(frame, className, (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,0,255), 2, cv2.LINE_AA)
+            cv2.putText(frame, className, (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,0,255), 2, \
+                    cv2.LINE_AA)
         
         # Show the final output
         cv2.imshow("Output", frame)
         
         if counter > 5: 
             if className == 'stop': 
-                print("stop") 
+                print("pose: stop")
+                if pause_func is not None:
+                    pause_func()
+
             elif className == 'thumbs up':
-                print("start")
+                print("pose: start")
+                if read_func is not None:
+                    read_func()
             counter = 0
         if pose == className: 
             counter = counter + 1 
