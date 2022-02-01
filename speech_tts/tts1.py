@@ -111,16 +111,16 @@ def speech_and_text():
             speech = speech.split()[0]
             print("Command given: " + speech)
 
-            if speech == "start":
+            if "start" in speech:
                 phrase = "starting text reading"
                 read()
-            elif speech == "stop":
+            elif "stop" in speech:
                 phrase = "stopping text reading"
                 pause()
-            elif speech == "pause":
+            elif "pause" in speech:
                 phrase = "pausing text reading"
                 pause()
-            elif speech == "play":
+            elif "play" in speech:
                 phrase = "resuming text reading"
                 unpause()
             # TODO speeding up/down currently not implemented, 
