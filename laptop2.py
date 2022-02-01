@@ -11,7 +11,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 # TechVidvan hand Gesture Recognizer
-
+import UI.README_UI as UI
 # import necessary packages
 
 import cv2
@@ -110,32 +110,36 @@ def main():
 
     # initialize UI
     # pose.setup()
-    app = QApplication(sys.argv)
-    a = pose.App()
-    c = a.palette()
-    c.setColor(a.backgroundRole(), Qt.gray)
-    a.setPalette(c)
-    a.show()
+    # app = QApplication(sys.argv)
+    # a = pose.App()
+    # c = a.palette()
+    # c.setColor(a.backgroundRole(), Qt.gray)
+    # a.setPalette(c)
+    # a.show()
 
     path = os.getcwd()
     speechtts.init()
     pose.init(path)
 
-    t1 = threading.Thread(target=test_text_recognition, args=())
+    t4 = threading.Thread(target=test_text_recognition, args=())
     t2 = threading.Thread(target=speechtts.speech_and_text, args=())
     t3 = threading.Thread(target=pose.loop, args=(
         speechtts.read, speechtts.pause))
+    t1 = threading.Thread(target=UI.setup, args=())
 
     t1.start()
     t2.start()
     t3.start()
+    t4.start()
 
     t1.join()
     t2.join()
     t3.join()
+    t4.join()
 
-    # pose.cleanup()
-    sys.exit(app.exec_())
+    pose.cleanup()
+    # sys.exit(app.exec_())
+    # sys.exit()
 
 
 if __name__ == '__main__':

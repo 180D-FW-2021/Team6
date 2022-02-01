@@ -9,7 +9,8 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
-from Instructions_Pop_up import Ui_MainWindow
+from UI.Instructions_Pop_up import Ui_MainWindow
+#from UI.Instructions_Pop_up import *
 
 
 class VideoThread(QThread):
@@ -64,13 +65,13 @@ class App(QWidget):
         # Text area ------------------------------------------------------
 
         # Webcam -------------------------------------------------------
-        self.Webcam = QLabel(self)
-        # self.Webcam.resize(640, 640)
-        self.Webcam.setGeometry(QtCore.QRect(1040, 550, 711, 470))
-        self.textLabel = QLabel('Webcam')
-        self.thread = VideoThread()
-        self.thread.change_pixmap_signal.connect(self.update_image)
-        self.thread.start()
+        # self.Webcam = QLabel(self)
+        # # self.Webcam.resize(640, 640)
+        # self.Webcam.setGeometry(QtCore.QRect(1040, 550, 711, 470))
+        # self.textLabel = QLabel('Webcam')
+        # self.thread = VideoThread()
+        # self.thread.change_pixmap_signal.connect(self.update_image)
+        # self.thread.start()
         # Webcam -------------------------------------------------------
 
         # Buttons ------------------------------------------------------------
@@ -140,8 +141,8 @@ class App(QWidget):
         return QPixmap.fromImage(p)
 
     def close(self):
+        cv2.destroyAllWindows()
         exit()
-
 
     def getImage(self):
         options = QtWidgets.QFileDialog.Options()
@@ -159,16 +160,16 @@ class App(QWidget):
             kernel = np.ones((1, 1), np.uint8)
             self.nn = cv2.dilate(self.gray_image, kernel, iterations=1)
             kernel = np.ones((1, 1), np.uint8)
-            self.nn  = cv2.erode(self.gray_image, kernel, iterations=1)
-            self.nn  = cv2.morphologyEx(self.gray_image, cv2.MORPH_CLOSE, kernel)
-            self.nn  = cv2.medianBlur(self.gray_image, 3)
+            self.nn = cv2.erode(self.gray_image, kernel, iterations=1)
+            self.nn = cv2.morphologyEx(
+                self.gray_image, cv2.MORPH_CLOSE, kernel)
+            self.nn = cv2.medianBlur(self.gray_image, 3)
             cv2.imwrite("no_noise.jpg", self.nn)
             pattern = ".(jpg|png|jpeg|bmp|jpe|tiff)$"
             self.fileName2 = "no_noise.jpg"
             if re.search(pattern, self.fileName2):
-                #self.setImage(self.fileName)
+                # self.setImage(self.fileName)
                 self.setImage(self.fileName)
-
 
     def setImage(self, fileName):
         self.labelImage.setPixmap(QPixmap(fileName))
@@ -205,6 +206,17 @@ class App(QWidget):
         self.window.show()
 
 
+def setup():
+    app = QApplication(sys.argv)
+    a = App()
+    c = a.palette()
+    c.setColor(a.backgroundRole(), Qt.gray)
+    a.setPalette(c)
+    a.show()
+    sys.exit(app.exec_())
+
+    # app.exec_()
+    # sys.exit()
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     a = App()

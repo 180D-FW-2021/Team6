@@ -79,13 +79,13 @@ class App(QWidget):
         # Text area ------------------------------------------------------
 
         # Webcam -------------------------------------------------------
-        self.Webcam = QLabel(self)
-        # self.Webcam.resize(640, 640)
-        self.Webcam.setGeometry(QtCore.QRect(1040, 550, 711, 470))
-        self.textLabel = QLabel('Webcam')
-        self.thread = VideoThread()
-        self.thread.change_pixmap_signal.connect(self.update_image)
-        self.thread.start()
+        # self.Webcam = QLabel(self)
+        # # self.Webcam.resize(640, 640)
+        # self.Webcam.setGeometry(QtCore.QRect(1040, 550, 711, 470))
+        # self.textLabel = QLabel('Webcam')
+        # self.thread = VideoThread()
+        # self.thread.change_pixmap_signal.connect(self.update_image)
+        # self.thread.start()
         # Webcam -------------------------------------------------------
 
         # Buttons ------------------------------------------------------------
@@ -248,7 +248,7 @@ def init(path):
     print(classNames)
 
     # Initialize the webcam
-    # cap = cv2.VideoCapture(0)
+    cap = cv2.VideoCapture(0)
 
     counter = 0
     pose = ""
