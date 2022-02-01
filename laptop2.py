@@ -7,7 +7,9 @@ import speech_recognition as sr
 import time
 import sys
 import pygame
-
+from PyQt5.QtWidgets import *
+from PyQt5.QtGui import *
+from PyQt5.QtCore import *
 # TechVidvan hand Gesture Recognizer
 
 # import necessary packages
@@ -107,7 +109,13 @@ def main():
     # global config.sampleText
 
     # initialize UI
-    pose.setup()
+    # pose.setup()
+    app = QApplication(sys.argv)
+    a = pose.App()
+    c = a.palette()
+    c.setColor(a.backgroundRole(), Qt.gray)
+    a.setPalette(c)
+    a.show()
 
     path = os.getcwd()
     speechtts.init()
@@ -127,6 +135,7 @@ def main():
     t3.join()
 
     pose.cleanup()
+    sys.exit(app.exec_())
 
 
 if __name__ == '__main__':
