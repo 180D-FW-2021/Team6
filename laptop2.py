@@ -134,7 +134,7 @@ def main():
     t2.join()
     t3.join()
 
-    pose.cleanup()
+    # pose.cleanup()
     sys.exit(app.exec_())
 
 
