@@ -142,6 +142,7 @@ class App(QWidget):
     def close(self):
         exit()
 
+
     def getImage(self):
         options = QtWidgets.QFileDialog.Options()
         options |= QtWidgets.QFileDialog.DontUseNativeDialog
@@ -150,9 +151,24 @@ class App(QWidget):
         # self.fileName, _ = QtWidgets.QFileDialog.getOpenFileName(self,"Open a image", "","All Files (*);;Image Files (*.jpg);;Image Files (*.png)", options=options)
         if self.fileName:
             print(self.fileName)
+            self.img = cv2.imread(self.fileName)
+            self.gray_image = cv2.cvtColor(self.img, cv2.COLOR_BGR2GRAY)
+            cv2.imwrite("gray.jpg", self.gray_image)
+            #thresh, self.im_bw = cv2.threshold(self.gray_image, 210, 230, cv2.THRESH_BINARY)
+            #cv2.imwrite("bw_image.jpg", self.im_bw)
+            kernel = np.ones((1, 1), np.uint8)
+            self.nn = cv2.dilate(self.gray_image, kernel, iterations=1)
+            kernel = np.ones((1, 1), np.uint8)
+            self.nn  = cv2.erode(self.gray_image, kernel, iterations=1)
+            self.nn  = cv2.morphologyEx(self.gray_image, cv2.MORPH_CLOSE, kernel)
+            self.nn  = cv2.medianBlur(self.gray_image, 3)
+            cv2.imwrite("no_noise.jpg", self.nn)
             pattern = ".(jpg|png|jpeg|bmp|jpe|tiff)$"
-            if re.search(pattern, self.fileName):
+            self.fileName2 = "no_noise.jpg"
+            if re.search(pattern, self.fileName2):
+                #self.setImage(self.fileName)
                 self.setImage(self.fileName)
+
 
     def setImage(self, fileName):
         self.labelImage.setPixmap(QPixmap(fileName))
@@ -160,7 +176,7 @@ class App(QWidget):
 
     def extractText(self):
         config = ('-l eng --oem 1 --psm 3')
-        img = cv2.imread(self.fileName, cv2.IMREAD_COLOR)
+        img = cv2.imread(self.fileName2, cv2.IMREAD_COLOR)
         # Run tesseract OCR on image
         text = pytesseract.image_to_string(img, config=config)
         # Print recognized text
