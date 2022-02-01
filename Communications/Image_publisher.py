@@ -1,6 +1,6 @@
 import paho.mqtt.client as mqtt
 import numpy as np
-
+from OCR.Camera import *
 # 0. define callbacks - functions that run when events happen.
 # The callback for when the client receives a CONNACK response from the server.
 
@@ -30,6 +30,7 @@ def on_message(client, userdata, message):
           message.topic + '" with QoS ' + str(message.qos))
 
 
+Camera()
 # 1. create a client instance.
 client = mqtt.Client()
 # add additional client options (security, certifications, etc.)
