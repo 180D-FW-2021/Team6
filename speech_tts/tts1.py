@@ -111,7 +111,12 @@ def unpause():
     pygame.mixer.music.unpause()
 
 def volumeUp():
-    pygame.mixer.get_volume()
+    cur_vol = pygame.mixer.get_volume()
+    pygame.mixer.set_volume(cur_vol + 0.1)
+
+def volumeDown():
+    cur_vol = pygame.mixer.get_volume()
+    pygame.mixer.set_volume(cur_vol - 0.1)
 
 def calibrate():
     global r, m
@@ -145,6 +150,12 @@ def speech():
             elif speech == "play":
                 phrase = "resuming text reading"
                 unpause()
+            elif speech == "louder":
+                phrase = "volume up"
+                volumeUp()
+            elif speech == "softer":
+                phrase = "volume down"
+                volumeDown()
             # TODO speeding up/down currently not implemented, 
             #      complications with the time required to resample the wav file
                 '''
