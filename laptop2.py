@@ -107,33 +107,25 @@ def on_disconnect(client, userdata, rc):
 # (you can create separate callbacks per subscribed topic)
 
 
-def on_message(client, userdata, message):
-    # text_file = open("sample.txt", "wt")
-    # n = text_file.write('Received message: "' + str(message.payload) + '"on topic "' +
-    #                    message.topic + '" with QoS ' + str(message.qos))
-    # text_file.close()
-    # sampletextfile = open(sys.argv[1], "r")
-    # sampletextfile = open("sample.txt", "r")
-    # sampleText = sampletextfile.read()
-    
-    print( "message received" )
-    print(str(message.payload))
-    process_text_mutex.acquire()
-    config.sampleText.append(str(message.payload))
-    process_text_mutex.release()
-    speechtts.process_text()
-
-
 # def on_message(client, userdata, message):
-#    img = cv2.imread("image1.jpg", cv2.IMREAD_COLOR)
+#    print( "message received" )
+#    print(str(message.payload))
 #    process_text_mutex.acquire()
-#    config.ImagePass = "image1.jpg"
-#    # save the processed text in 'text' to send with mqtt
-#    text = pytesseract.image_to_string(img)
-#    config.gotImage = 1
-#    config.sampleText = text
+#    config.sampleText.append(str(message.payload))
 #    process_text_mutex.release()
 #    speechtts.process_text()
+
+# with image
+def on_message(client, userdata, message):
+   img = cv2.imread("image1.jpg", cv2.IMREAD_COLOR)
+   process_text_mutex.acquire()
+   config.ImagePass = "image1.jpg"
+   # save the processed text in 'text' to send with mqtt
+   text = pytesseract.image_to_string(img)
+   config.gotImage = 1
+   config.sampleText.append(text)
+   process_text_mutex.release()
+   speechtts.process_text()
 
 
 def text_recognition():
