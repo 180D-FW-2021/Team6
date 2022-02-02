@@ -64,7 +64,7 @@ def image_test():
     nn = cv2.erode(gray_image, kernel, iterations=1)
     nn = cv2.morphologyEx(gray_image, cv2.MORPH_CLOSE, kernel)
     nn = cv2.medianBlur(gray_image, 3)
-    cv2.imwrite("image1_Processed.jpg", nn)
+    cv2.imwrite("image1_processed.jpg", nn)
 
     # save the processed text in 'text' to send with mqtt
     text = pytesseract.image_to_string(nn)
