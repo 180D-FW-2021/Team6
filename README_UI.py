@@ -43,7 +43,7 @@ class App(QWidget):
         super().__init__()
         pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
         self.setWindowTitle("READEME")
-        self.resize(3000, 3000)
+        self.resize(1920, 1080)
 
         # Image area ---------------------------------------------------
         self.labelImage = QLabel(self)
@@ -78,45 +78,45 @@ class App(QWidget):
         # Buttons ------------------------------------------------------------
         self.Loadimage = QPushButton("Load Image", self)
         self.Loadimage.setObjectName("Load Image")
-        self.Loadimage.setGeometry(QtCore.QRect(30, 610, 171, 41))
-        self.Loadimage.resize(200, 50)
+        self.Loadimage.setGeometry(QtCore.QRect(225, 610, 250, 41))
+        self.Loadimage.resize(250, 75)
         self.Loadimage.setFont(QFont('Times', 15))
         self.Loadimage.clicked.connect(self.getImage)
 
         self.Run = QPushButton("Run", self)
         self.Run.setObjectName("Run")
-        self.Run.setGeometry(QtCore.QRect(30, 660, 171, 41))
-        self.Run.resize(200, 50)
+        self.Run.setGeometry(QtCore.QRect(225, 685, 250, 41))
+        self.Run.resize(250, 75)
         self.Run.setFont(QFont('Times', 15))
         self.Run.clicked.connect(self.extractText)
 
         self.Clear = QPushButton("Clear", self)
         self.Clear.setObjectName("Clear")
-        self.Clear.setGeometry(QtCore.QRect(30, 710, 171, 41))
-        self.Clear.resize(200, 50)
+        self.Clear.setGeometry(QtCore.QRect(225, 760, 250, 41))
+        self.Clear.resize(250, 75)
         self.Clear.setFont(QFont('Times', 15))
         self.Clear.clicked.connect(self.clearText)
 
         self.Save = QPushButton("Save text", self)
         self.Save.setObjectName("Save text")
-        self.Save.setGeometry(QtCore.QRect(30, 760, 171, 41))
-        self.Save.resize(200, 50)
+        self.Save.setGeometry(QtCore.QRect(225, 835, 250, 41))
+        self.Save.resize(250, 75)
         self.Save.setFont(QFont('Times', 15))
         self.Save.clicked.connect(self.saveText)
 
         self.Instructions = QPushButton("Instructions", self)
         self.Instructions.setObjectName("Instructions")
-        self.Instructions.setGeometry(QtCore.QRect(30, 810, 171, 41))
-        self.Instructions.resize(200, 50)
+        self.Instructions.setGeometry(QtCore.QRect(225, 910, 250, 41))
+        self.Instructions.resize(250, 75)
         self.Instructions.setFont(QFont('Times', 15))
         self.Instructions.clicked.connect(self.openWindow)
 
-        self.Exit = QPushButton("Exit", self)
-        self.Exit.setObjectName("Exit")
-        self.Exit.setGeometry(QtCore.QRect(30, 860, 171, 41))
-        self.Exit.resize(200, 50)
-        self.Exit.setFont(QFont('Times', 15))
-        self.Exit.clicked.connect(self.close)
+        # self.Exit = QPushButton("Exit", self)
+        # self.Exit.setObjectName("Exit")
+        # self.Exit.setGeometry(QtCore.QRect(30, 860, 171, 41))
+        # self.Exit.resize(200, 50)
+        # self.Exit.setFont(QFont('Times', 15))
+        # self.Exit.clicked.connect(self.close)
 
         # Buttons ------------------------------------------------------------
 
@@ -225,15 +225,16 @@ def setup():
         a.setText(config.sampleText)
     sys.exit(app.exec_())
 
+
     # app.exec_()
     # sys.exit()
-# if __name__ == "__main__":
-#     app = QApplication(sys.argv)
-#     a = App()
-#     c = a.palette()
-#     c.setColor(a.backgroundRole(), Qt.gray)
-#     a.setPalette(c)
-#     a.show()
-#     a.setText("THis is a test")
-#     # a.setImage()
-#     sys.exit(app.exec_())
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+    a = App()
+    c = a.palette()
+    c.setColor(a.backgroundRole(), Qt.gray)
+    a.setPalette(c)
+    a.show()
+    #a.setText("THis is a test")
+    # a.setImage()
+    sys.exit(app.exec_())
