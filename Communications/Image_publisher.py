@@ -1,6 +1,6 @@
 import paho.mqtt.client as mqtt
 import numpy as np
-from OCR.Camera import *
+import cv2
 # 0. define callbacks - functions that run when events happen.
 # The callback for when the client receives a CONNACK response from the server.
 
@@ -30,7 +30,37 @@ def on_message(client, userdata, message):
           message.topic + '" with QoS ' + str(message.qos))
 
 
-Camera()
+def Camera():
+    key = cv2. waitKey(1)
+    webcam = cv2.VideoCapture(1)
+    while True:
+        try:
+            check, frame = webcam.read()
+            cv2.imshow("Capturing", frame)
+            key = cv2.waitKey(1)
+            if key == ord('s'):
+                cv2.imwrite(filename='saved_img.jpg', img=frame)
+                webcam.release()
+                img_new = cv2.imread('saved_img.jpg', cv2.IMREAD_GRAYSCALE)
+                img_new = cv2.imshow("Captured Image", img_new)
+                cv2.waitKey(1650)
+                cv2.destroyAllWindows()
+                img_ = cv2.imread('saved_img.jpg', cv2.IMREAD_ANYCOLOR)
+                gray = cv2.cvtColor(img_, cv2.COLOR_BGR2GRAY)
+                img_ = cv2.resize(gray, (28, 28))
+                img_resized = cv2.imwrite(
+                    filename='saved_img-final.jpg', img=img_)
+                break
+            elif key == ord('q'):
+                webcam.release()
+                cv2.destroyAllWindows()
+                exit()
+        except(KeyboardInterrupt):
+            webcam.release()
+            cv2.destroyAllWindows()
+            break
+
+
 # 1. create a client instance.
 client = mqtt.Client()
 # add additional client options (security, certifications, etc.)
@@ -52,7 +82,7 @@ client.loop_start()
 # payload must be a string, bytearray, int, float or None.
 #text = 'My very photogenic mother died in a freak accident (picnic, lightning) when I was three, and, save for a pocket of warmth in the darkest past, nothing of her subsists within the hollows and dells of memory, over which, if you can still stand my style (I am writing under observation), the sun of my infancy had set: surely, you all know those redolent remnants of day suspended, with the midges, about some hedge in bloom or suddenly entered and traversed by the rambler, at the bottom of a hill, in the summer dusk; a furry warmth, golden midges.'
 
-f = open("saved_img-final.jpg")
+f = open("saved_img.jpg")
 filecontent = f.read()
 byteArr = bytearray(filecontent)
 
