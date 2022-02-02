@@ -28,7 +28,6 @@ def on_message(client, userdata, message):
     print('Received message: "' + str(message.payload) + '"on topic "' +
           message.topic + '" with QoS ' + str(message.qos))
 
-
 def client_instance():
     # 1. create a client instance.
     client = mqtt.Client()
@@ -58,3 +57,28 @@ def client_instance():
     # use disconnect() to disconnect from the broker.
     client.loop_stop()
     client.disconnect()
+
+
+# 1. create a client instance.
+client = mqtt.Client()
+# add additional client options (security, certifications, etc.)
+# many default options should be good to start off.
+# add callbacks to client.
+client.on_connect = on_connect
+client.on_disconnect = on_disconnect
+client.on_message = on_message
+5
+# 2. connect to a broker using one of the connect*() functions.
+client.connect_async('mqtt.eclipseprojects.io')
+# client.connect("mqtt.eclipse.org")
+# 3. call one of the loop*() functions to maintain network traffic flow with the broker.
+client.loop_start()
+# client.loop_forever()
+while True:
+	pass
+	
+# use subscribe() to subscribe to a topic and receive messages.
+# use publish() to publish messages to the broker.
+# use disconnect() to disconnect from the broker.
+client.loop_stop()
+client.disconnect()
