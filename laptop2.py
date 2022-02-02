@@ -93,7 +93,7 @@ def on_connect(client, userdata, flags, rc):
 
     # Subscribing in on_connect() means that if we lose the connection and
     # reconnect then subscriptions will be renewed.
-    client.subscribe("ece180d/text", qos=1)
+    client.subscribe("ece180d/text2", qos=1)
 
 # The callback of the client when it disconnects.
 
@@ -139,8 +139,8 @@ def on_message(client, userdata, message):
     print(text)
     process_text_mutex.acquire()
     config.ImagePass = "receive.jpg"
-    config.sampleText = text
-    # config.sampleText.append(text)
+    #config.sampleText = text
+    config.sampleText.append(text)
 
     process_text_mutex.release()
     speechtts.process_text()

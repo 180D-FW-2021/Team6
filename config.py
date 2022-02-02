@@ -1,5 +1,5 @@
 # shared globals for laptop script
-sampleText = ''
+sampleText = []
 outfile = []
 
 # Image variables
