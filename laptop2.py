@@ -7,9 +7,11 @@ import speech_recognition as sr
 import time
 import sys
 import pygame
-
+from PyQt5.QtWidgets import *
+from PyQt5.QtGui import *
+from PyQt5.QtCore import *
 # TechVidvan hand Gesture Recognizer
-
+import README_UI as UI
 # import necessary packages
 
 import cv2
@@ -20,12 +22,16 @@ from tensorflow.keras.models import load_model
 
 # import functions
 import config
-import speech_tts.tts1 as speechtts 
+import speech_tts.tts1 as speechtts
 import hand_gesture_recognition_code.TechVidvan_hand_gesture_detection as pose
+
 # import Communications.gesture_control_subscriber as comms
 
-
+import OCR.OCR as pytest
+import pytesseract
 process_text_mutex = threading.Lock()
+pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
+
 
 def test_text_recognition():
     sampletextfile = []
@@ -43,8 +49,42 @@ def test_text_recognition():
             process_text_mutex.release()
             speechtts.process_text()
 
+
+# def image_test():
+#     img = cv2.imread("image1.jpg", cv2.IMREAD_COLOR)
+#     process_text_mutex.acquire()
+#     config.ImagePass = "image1.jpg"
+#     # save the processed text in 'text' to send with mqtt
+#     text = pytesseract.image_to_string(img)
+#     config.gotImage = 1
+#     config.sampleText = text
+#     process_text_mutex.release()
+#     speechtts.process_text()
+#     config.gotImage = 0
+
+def image_test():
+    img = cv2.imread("image1.jpg", cv2.IMREAD_COLOR)
+    config.ImagePass = "image1.jpg"
+    process_text_mutex.acquire()
+    gray_image = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    kernel = np.ones((1, 1), np.uint8)
+    nn = cv2.dilate(gray_image, kernel, iterations=1)
+    kernel = np.ones((1, 1), np.uint8)
+    nn = cv2.erode(gray_image, kernel, iterations=1)
+    nn = cv2.morphologyEx(gray_image, cv2.MORPH_CLOSE, kernel)
+    nn = cv2.medianBlur(gray_image, 3)
+    cv2.imwrite("image1_processed.jpg", nn)
+
+    # save the processed text in 'text' to send with mqtt
+    text = pytesseract.image_to_string(nn)
+    config.gotImage = 1
+    config.sampleText = text
+    process_text_mutex.release()
+    speechtts.process_text()
+    config.gotImage = 0
 # 0. define callbacks - functions that run when events happen.
 # The callback for when the client receives a CONNACK response from the server.
+
 
 def on_connect(client, userdata, flags, rc):
     print("Connection returned result: "+str(rc))
@@ -54,24 +94,41 @@ def on_connect(client, userdata, flags, rc):
     client.subscribe("ece180d/text", qos=1)
 
 # The callback of the client when it disconnects.
+
+
 def on_disconnect(client, userdata, rc):
     if rc != 0:
-            print('Unexpected Disconnect')
+        print('Unexpected Disconnect')
     else:
-            print('Expected Disconnect')
+        print('Expected Disconnect')
 
 # The default message callback.
 # (you can create separate callbacks per subscribed topic)
+
+
+# def on_message(client, userdata, message):
+#     text_file = open("sample.txt", "wt")
+#     n = text_file.write('Received message: "' + str(message.payload) + '"on topic "' +
+#                         message.topic + '" with QoS ' + str(message.qos))
+#     text_file.close()
+#     #sampletextfile = open(sys.argv[1], "r")
+#     sampletextfile = open("sample.txt", "r")
+#     sampleText = sampletextfile.read()
+#     speechtts.process_text()
+
+
 def on_message(client, userdata, message):
-    text_file = open("sample.txt","wt")
-    n = text_file.write('Received message: "' + str(message.payload) + '"on topic "' + \
-            message.topic + '" with QoS ' + str(message.qos))
-    text_file.close()
-    #sampletextfile = open(sys.argv[1], "r")
-    sampletextfile = open("sample.txt", "r")
-    sampleText = sampletextfile.read()
+    img = cv2.imread("image1.jpg", cv2.IMREAD_COLOR)
+    process_text_mutex.acquire()
+    config.ImagePass = "image1.jpg"
+    # save the processed text in 'text' to send with mqtt
+    text = pytesseract.image_to_string(img)
+    config.gotImage = 1
+    config.sampleText = text
+    process_text_mutex.release()
     speechtts.process_text()
-        
+
+
 def text_recognition():
     # 1. create a client instance.
     client = mqtt.Client()
@@ -92,10 +149,9 @@ def text_recognition():
     client.loop_start()
     # client.loop_forever()
 
-    while True:
-        pass
+    # while True:
+    #     pass
 
-   
     # use subscribe() to subscribe to a topic and receive messages.
 
     # use publish() to publish messages to the broker.
@@ -104,30 +160,42 @@ def text_recognition():
     client.loop_stop()
     client.disconnect()
 
+
 def main():
     # global config.sampleText
-    
+
+    # pose.setup()
+
     path = os.getcwd()
     speechtts.init()
     pose.init(path)
 
-    t1 = threading.Thread(target=test_text_recognition, args=()) 
+    t1 = threading.Thread(target=UI.setup, args=())
     t2 = threading.Thread(target=speechtts.speech, args=()) 
     t3 = threading.Thread(target=pose.loop, args=(speechtts.read, speechtts.pause)) 
-    t4 = threading.Thread(target=speechtts.tts, args=()) 
-
+    t4 = threading.Thread(target=speechtts.tts, args=())
+    t5 = threading.Thread(target=image_test(), args=())
+ 
     t1.start()
     t2.start()
     t3.start()
     t4.start()
+    t5.start()
 
     t1.join()
     t2.join()
     t3.join()
     t4.join()
+    t5.start()
 
+<<<<<<< HEAD
     # pose.cleanup()
+=======
+    pose.cleanup()
+    # sys.exit(app.exec_())
+    # sys.exit()
+
+>>>>>>> 1d7dd687a48734eea77459acf52c67db987602b4
 
 if __name__ == '__main__':
     main()
-

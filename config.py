@@ -1,3 +1,9 @@
 # shared globals for laptop script
-sampleText  = 'hi'
+sampleText = 'hi'
 outfile = None
+
+# Image variables
+gotImage = 0
+ImagePass = None
+cap = None
+frame = None
