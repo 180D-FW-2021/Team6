@@ -25,7 +25,7 @@ def on_disconnect(client, userdata, rc):
 
 
 def on_message(client, userdata, message):
-    f = open('image1.jpg', 'w')
+    f = open('saved_img-final.jpg', 'w')
     f.write(message.payload)
     f.close()
     print('image received')

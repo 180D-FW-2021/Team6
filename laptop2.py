@@ -41,19 +41,38 @@ def test_text_recognition():
     speechtts.process_text()
 
 
+# def image_test():
+#     img = cv2.imread("image1.jpg", cv2.IMREAD_COLOR)
+#     process_text_mutex.acquire()
+#     config.ImagePass = "image1.jpg"
+#     # save the processed text in 'text' to send with mqtt
+#     text = pytesseract.image_to_string(img)
+#     config.gotImage = 1
+#     config.sampleText = text
+#     process_text_mutex.release()
+#     speechtts.process_text()
+#     config.gotImage = 0
+
 def image_test():
     img = cv2.imread("image1.jpg", cv2.IMREAD_COLOR)
-    process_text_mutex.acquire()
     config.ImagePass = "image1.jpg"
+    process_text_mutex.acquire()
+    gray_image = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    kernel = np.ones((1, 1), np.uint8)
+    nn = cv2.dilate(gray_image, kernel, iterations=1)
+    kernel = np.ones((1, 1), np.uint8)
+    nn = cv2.erode(gray_image, kernel, iterations=1)
+    nn = cv2.morphologyEx(gray_image, cv2.MORPH_CLOSE, kernel)
+    nn = cv2.medianBlur(gray_image, 3)
+    cv2.imwrite("image1_processed.jpg", nn)
+
     # save the processed text in 'text' to send with mqtt
-    text = pytesseract.image_to_string(img)
+    text = pytesseract.image_to_string(nn)
     config.gotImage = 1
     config.sampleText = text
     process_text_mutex.release()
     speechtts.process_text()
     config.gotImage = 0
-
-
 # 0. define callbacks - functions that run when events happen.
 # The callback for when the client receives a CONNACK response from the server.
 
