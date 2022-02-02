@@ -126,6 +126,7 @@ void setup() {
   BLE.advertise();
 
   Serial.println("BLE Peripheral");
+  Serial.println( BLE.address());
   
 }
 

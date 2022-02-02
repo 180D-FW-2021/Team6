@@ -188,14 +188,9 @@ def main():
     t4.join()
     t5.start()
 
-<<<<<<< HEAD
-    # pose.cleanup()
-=======
     pose.cleanup()
     # sys.exit(app.exec_())
     # sys.exit()
-
->>>>>>> 1d7dd687a48734eea77459acf52c67db987602b4
 
 if __name__ == '__main__':
     main()

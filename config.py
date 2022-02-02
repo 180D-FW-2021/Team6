@@ -1,6 +1,6 @@
 # shared globals for laptop script
-sampleText = 'hi'
-outfile = None
+sampleText = []
+outfile = []
 
 # Image variables
 gotImage = 0
