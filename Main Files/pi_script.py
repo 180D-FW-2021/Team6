@@ -1,9 +1,12 @@
 import pytesseract
 import paho.mqtt.client as mqtt
 import numpy as np
+import cv2
 import os
+import time 
 
-pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
+pytesseract.pytesseract.tesseract_cmd = r'/usr/bin/tesseract'
+
 def on_connect(client, userdata, flags, rc):
 	print("Connection returned result: "+str(rc))
 
@@ -20,6 +23,7 @@ def on_disconnect(client, userdata, rc):
 		print('Expected Disconnect')
 
 # The default message callback.
+
 # (won’t be used if only publishing, but can still exist)
 def on_message(client, userdata, message):
 	print('Received message: "' + str(message.payload) + '" on topic "' +
@@ -34,8 +38,8 @@ text = pytesseract.image_to_string(img)
 print(text)
 
     # Adding custom options
-custom_config = r'--oem 3 --psm 6'
-pytesseract.image_to_string(img, config=custom_config)
+#custom_config = r'--oem 3 --psm 6'
+#pytesseract.image_to_string(img, config=custom_config)
 
 
     # 0. define callbacks - functions that run when events happen.
@@ -52,7 +56,7 @@ client.on_disconnect = on_disconnect
 client.on_message = on_message
 
     # 2. connect to a broker using one of the connect*() functions.
-client.connect_async('mqtt.eclipseprojects.io')
+client.connect_async('test.mosquitto.org')
 
     # 3. call one of the loop*() functions to maintain network traffic flow with the broker.
 client.loop_start()
@@ -61,8 +65,7 @@ client.loop_start()
 
     # 5. use publish() to publish messages to the broker.
     # payload must be a string, bytearray, int, float or None.
-    #text = 'My very photogenic mother died in a freak accident (picnic, lightning) when I was three, and, save for a pocket of warmth in the darkest past, nothing of her subsists within the hollows and dells of memory, over which, if you can still stand my style (I am writing under observation), the sun of my infancy had set: surely, you all know those redolent remnants of day suspended, with the midges, about some hedge in bloom or suddenly entered and traversed by the rambler, at the bottom of a hill, in the summer dusk; a furry warmth, golden midges.'
-
+    
 client.publish('ece180d/text', text, qos=1)
 
     # 6. use disconnect() to disconnect from the broker.
