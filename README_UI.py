@@ -23,13 +23,17 @@ class VideoThread(QThread):
 
     def run(self):
         # capture from web cam
-        cap = cv2.VideoCapture(0)
+        # cap = cv2.VideoCapture(0)
         while self._run_flag:
-            ret, cv_img = cap.read()
-            if ret:
+            print('webcam') # for some reason, this makes it less laggy?
+            if config.frame is not None:
+                cv_img = config.frame
                 self.change_pixmap_signal.emit(cv_img)
+        #    ret, cv_img = cap.read()
+        #    if ret:
+        #        self.change_pixmap_signal.emit(cv_img)
         # shut down capture system
-        cap.release()
+        # cap.release()
 
     def stop(self):
         """Sets run flag to False and waits for thread to finish"""
@@ -66,13 +70,13 @@ class App(QWidget):
         # Text area ------------------------------------------------------
 
         # Webcam -------------------------------------------------------
-        # self.Webcam = QLabel(self)
-        # # self.Webcam.resize(640, 640)
-        # self.Webcam.setGeometry(QtCore.QRect(1040, 550, 711, 470))
-        # self.textLabel = QLabel('Webcam')
-        # self.thread = VideoThread()
-        # self.thread.change_pixmap_signal.connect(self.update_image)
-        # self.thread.start()
+        self.Webcam = QLabel(self)
+        # self.Webcam.resize(640, 640)
+        self.Webcam.setGeometry(QtCore.QRect(1040, 550, 711, 470))
+        self.textLabel = QLabel('Webcam')
+        self.thread = VideoThread()
+        self.thread.change_pixmap_signal.connect(self.update_image)
+        self.thread.start()
         # Webcam -------------------------------------------------------
 
         # Buttons ------------------------------------------------------------

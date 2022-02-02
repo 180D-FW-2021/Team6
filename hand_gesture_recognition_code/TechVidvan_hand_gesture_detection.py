@@ -79,13 +79,13 @@ class App(QWidget):
         # Text area ------------------------------------------------------
 
         # Webcam -------------------------------------------------------
-        # self.Webcam = QLabel(self)
-        # # self.Webcam.resize(640, 640)
-        # self.Webcam.setGeometry(QtCore.QRect(1040, 550, 711, 470))
-        # self.textLabel = QLabel('Webcam')
-        # self.thread = VideoThread()
-        # self.thread.change_pixmap_signal.connect(self.update_image)
-        # self.thread.start()
+        self.Webcam = QLabel(self)
+        # self.Webcam.resize(640, 640)
+        self.Webcam.setGeometry(QtCore.QRect(1040, 550, 711, 470))
+        self.textLabel = QLabel('Webcam')
+        self.thread = VideoThread()
+        self.thread.change_pixmap_signal.connect(self.update_image)
+        self.thread.start()
         # Webcam -------------------------------------------------------
 
         # Buttons ------------------------------------------------------------
@@ -301,7 +301,8 @@ def loop(read_func=None, pause_func=None):
                         cv2.LINE_AA)
 
         # Show the final output
-        cv2.imshow("Output", frame)
+        # cv2.imshow("Output", frame)
+        config.frame = frame
 
         if counter > 5:
             if className == 'stop':
