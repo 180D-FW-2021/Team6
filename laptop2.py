@@ -140,6 +140,7 @@ def on_message(client, userdata, message):
     process_text_mutex.acquire()
     config.ImagePass = "receive.jpg"
     #config.sampleText = text
+    config.start = 1
     config.sampleText.append(text)
 
     process_text_mutex.release()

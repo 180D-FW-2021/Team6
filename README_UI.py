@@ -49,6 +49,10 @@ class App(QWidget):
         self.setWindowTitle("READEME")
         self.resize(1920, 1080)
 
+        timer = QTimer(self)
+        timer.timeout.connect(self.updateScreen)
+        timer.start(10000)
+
         # Image area ---------------------------------------------------
         self.labelImage = QLabel(self)
         self.labelImage.setGeometry(QtCore.QRect(30, 50, 711, 470))
@@ -211,13 +215,16 @@ class App(QWidget):
         self.window.show()
 
     def setText(self, text):
-        strC = self.listToString(text)
+        #strC = self.listToString(text)
+        strC = text[-1]
         self.textEdit.append(strC)
 
     def updateScreen(self):
-        print(config.sampleText)
-        self.setText(config.sampleText)
-        self.setImage(config.ImagePass)
+        if config.start == 1:
+            print(config.sampleText)
+            self.setText(config.sampleText)
+            self.setImage(config.ImagePass)
+            config.start = 0
 
     def listToString(self, s):
 
@@ -236,7 +243,6 @@ def setup():
     a.setPalette(c)
     a.show()
     sys.exit(app.exec_())
-
 
     # app.exec_()
     # sys.exit()
