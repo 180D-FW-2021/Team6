@@ -1,30 +1,17 @@
-# TechVidvan hand Gesture Recognizer
 
-# import necessary packages
-
-import cv2
-import numpy as np
-import mediapipe as mp
-import tensorflow as tf
+from PyQt5 import QtGui
 import pytesseract
-import re
 import sys
-from tensorflow.keras.models import load_model
+import cv2
+import re
+import numpy as np
+import config
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from UI.Instructions_Pop_up import Ui_MainWindow
-import config
-
-mpHands = None
-hands = None
-mpDraw = None
-model = None
-classNames = None
-cap = None
-counter = 0
-pose = None
+#from UI.Instructions_Pop_up import *
 
 
 class VideoThread(QThread):
@@ -155,6 +142,7 @@ class App(QWidget):
         return QPixmap.fromImage(p)
 
     def close(self):
+        cv2.destroyAllWindows()
         exit()
 
     def getImage(self):
@@ -218,7 +206,8 @@ class App(QWidget):
         self.ui.setupUi(self.window)
         self.window.show()
 
-# path arg is path of Team6 folder
+    def setText(self, text):
+        self.textEdit.append(text)
 
 
 def setup():
@@ -228,110 +217,23 @@ def setup():
     c.setColor(a.backgroundRole(), Qt.gray)
     a.setPalette(c)
     a.show()
+    if config.gotImage == 1:
+        #a.setText("THis is a test")
+        print("gets here")
+        print("%d" % config.gotImage)
+        a.setImage(config.ImagePass)
+        a.setText(config.sampleText)
     sys.exit(app.exec_())
 
-
-def init(path):
-    global mpHands, hands, mpDraw, model, classNames, cap, counter, pose
-    # initialize mediapipe
-    mpHands = mp.solutions.hands
-    hands = mpHands.Hands(max_num_hands=1, min_detection_confidence=0.7)
-    mpDraw = mp.solutions.drawing_utils
-
-    # Load the gesture recognizer model
-    model = load_model(path + '\hand_gesture_recognition_code\mp_hand_gesture')
-
-    # Load class names
-    f = open(path + '\hand_gesture_recognition_code\gesture.names', 'r')
-    classNames = f.read().split('\n')
-    f.close()
-    print(classNames)
-
-    # Initialize the webcam
-    cap = cv2.VideoCapture(0)
-
-    counter = 0
-    pose = ""
-
-
-def loop(read_func=None, pause_func=None):
-    global mpHands, hands, mpDraw, model, classNames, cap, counter, pose
-    config.gotImage = True
-    while True:
-        # Read each frame from the webcam
-        _, frame = cap.read()
-
-        x, y, c = frame.shape
-
-        # Flip the frame vertically
-        frame = cv2.flip(frame, 1)
-        framergb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-
-        # Get hand landmark prediction
-        result = hands.process(framergb)
-
-        # print(result)
-
-        className = ''
-
-        # post process the result
-        if result.multi_hand_landmarks:
-            landmarks = []
-            for handslms in result.multi_hand_landmarks:
-                for lm in handslms.landmark:
-                    # print(id, lm)
-                    lmx = int(lm.x * x)
-                    lmy = int(lm.y * y)
-
-                    landmarks.append([lmx, lmy])
-
-                # Drawing landmarks on frames
-                mpDraw.draw_landmarks(
-                    frame, handslms, mpHands.HAND_CONNECTIONS)
-
-                # Predict gesture
-                prediction = model.predict([landmarks])
-                # print(prediction)
-                classID = np.argmax(prediction)
-                className = classNames[classID]
-
-        # show the prediction on the frame
-        if className == 'stop' or className == 'thumbs up':
-            cv2.putText(frame, className, (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2,
-                        cv2.LINE_AA)
-
-        # Show the final output
-        cv2.imshow("Output", frame)
-
-        if counter > 5:
-            if className == 'stop':
-                print("pose: stop")
-                if pause_func is not None:
-                    pause_func()
-
-            elif className == 'thumbs up':
-                print("pose: start")
-                if read_func is not None:
-                    read_func()
-            counter = 0
-        if pose == className:
-            counter = counter + 1
-
-        pose = className
-
-        if cv2.waitKey(1) == ord('q'):
-            break
-
-
-def cleanup():
-    global cap
-    # release the webcam and destroy all active windows
-    cap.release()
-
-    cv2.destroyAllWindows()
-
-# import os
-# path = os.getcwd()
-# init(path)
-# loop()
-# cleanup()
+    # app.exec_()
+    # sys.exit()
+# if __name__ == "__main__":
+#     app = QApplication(sys.argv)
+#     a = App()
+#     c = a.palette()
+#     c.setColor(a.backgroundRole(), Qt.gray)
+#     a.setPalette(c)
+#     a.show()
+#     a.setText("THis is a test")
+#     # a.setImage()
+#     sys.exit(app.exec_())

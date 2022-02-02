@@ -11,7 +11,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 # TechVidvan hand Gesture Recognizer
-import UI.README_UI as UI
+import README_UI as UI
 # import necessary packages
 
 import cv2
@@ -27,8 +27,10 @@ import hand_gesture_recognition_code.TechVidvan_hand_gesture_detection as pose
 
 # import Communications.gesture_control_subscriber as comms
 
-
+import OCR.OCR as pytest
+import pytesseract
 process_text_mutex = threading.Lock()
+pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
 
 
 def test_text_recognition():
@@ -37,6 +39,20 @@ def test_text_recognition():
     config.sampleText = sampletextfile.read()
     process_text_mutex.release()
     speechtts.process_text()
+
+
+def image_test():
+    img = cv2.imread("image1.jpg", cv2.IMREAD_COLOR)
+    process_text_mutex.acquire()
+    config.ImagePass = "image1.jpg"
+    # save the processed text in 'text' to send with mqtt
+    text = pytesseract.image_to_string(img)
+    config.gotImage = 1
+    config.sampleText = text
+    process_text_mutex.release()
+    speechtts.process_text()
+    config.gotImage = 0
+
 
 # 0. define callbacks - functions that run when events happen.
 # The callback for when the client receives a CONNACK response from the server.
@@ -62,14 +78,26 @@ def on_disconnect(client, userdata, rc):
 # (you can create separate callbacks per subscribed topic)
 
 
+# def on_message(client, userdata, message):
+#     text_file = open("sample.txt", "wt")
+#     n = text_file.write('Received message: "' + str(message.payload) + '"on topic "' +
+#                         message.topic + '" with QoS ' + str(message.qos))
+#     text_file.close()
+#     #sampletextfile = open(sys.argv[1], "r")
+#     sampletextfile = open("sample.txt", "r")
+#     sampleText = sampletextfile.read()
+#     speechtts.process_text()
+
+
 def on_message(client, userdata, message):
-    text_file = open("sample.txt", "wt")
-    n = text_file.write('Received message: "' + str(message.payload) + '"on topic "' +
-                        message.topic + '" with QoS ' + str(message.qos))
-    text_file.close()
-    #sampletextfile = open(sys.argv[1], "r")
-    sampletextfile = open("sample.txt", "r")
-    sampleText = sampletextfile.read()
+    img = cv2.imread("image1.jpg", cv2.IMREAD_COLOR)
+    process_text_mutex.acquire()
+    config.ImagePass = "image1.jpg"
+    # save the processed text in 'text' to send with mqtt
+    text = pytesseract.image_to_string(img)
+    config.gotImage = 1
+    config.sampleText = text
+    process_text_mutex.release()
     speechtts.process_text()
 
 
@@ -93,8 +121,8 @@ def text_recognition():
     client.loop_start()
     # client.loop_forever()
 
-    while True:
-        pass
+    # while True:
+    #     pass
 
     # use subscribe() to subscribe to a topic and receive messages.
 
@@ -108,20 +136,13 @@ def text_recognition():
 def main():
     # global config.sampleText
 
-    # initialize UI
     # pose.setup()
-    # app = QApplication(sys.argv)
-    # a = pose.App()
-    # c = a.palette()
-    # c.setColor(a.backgroundRole(), Qt.gray)
-    # a.setPalette(c)
-    # a.show()
 
     path = os.getcwd()
     speechtts.init()
     pose.init(path)
 
-    t4 = threading.Thread(target=test_text_recognition, args=())
+    t4 = threading.Thread(target=image_test(), args=())
     t2 = threading.Thread(target=speechtts.speech_and_text, args=())
     t3 = threading.Thread(target=pose.loop, args=(
         speechtts.read, speechtts.pause))

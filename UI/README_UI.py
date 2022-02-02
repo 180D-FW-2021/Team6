@@ -9,8 +9,9 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
-from UI.Instructions_Pop_up import Ui_MainWindow
+from Instructions_Pop_up import Ui_MainWindow
 #from UI.Instructions_Pop_up import *
+#import config
 
 
 class VideoThread(QThread):
@@ -205,6 +206,9 @@ class App(QWidget):
         self.ui.setupUi(self.window)
         self.window.show()
 
+    def setText(self, text):
+        self.textEdit.append(text)
+
 
 def setup():
     app = QApplication(sys.argv)
@@ -213,6 +217,7 @@ def setup():
     c.setColor(a.backgroundRole(), Qt.gray)
     a.setPalette(c)
     a.show()
+
     sys.exit(app.exec_())
 
     # app.exec_()
@@ -224,4 +229,6 @@ if __name__ == "__main__":
     c.setColor(a.backgroundRole(), Qt.gray)
     a.setPalette(c)
     a.show()
+    #a.setText("THis is a test")
+    # a.setImage()
     sys.exit(app.exec_())
