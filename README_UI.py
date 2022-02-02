@@ -213,6 +213,10 @@ class App(QWidget):
     def setText(self, text):
         self.textEdit.append(text)
 
+    def updateScreen(self):
+        self.setText(config.sampleText)
+        self.setImage(config.ImagePass)
+
 
 def setup():
     app = QApplication(sys.argv)
@@ -228,7 +232,6 @@ def setup():
         a.setImage(config.ImagePass)
         a.setText(config.sampleText)
     sys.exit(app.exec_())
-
 
     # app.exec_()
     # sys.exit()
