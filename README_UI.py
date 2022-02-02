@@ -25,7 +25,7 @@ class VideoThread(QThread):
         # capture from web cam
         # cap = cv2.VideoCapture(0)
         while self._run_flag:
-            print('webcam') # for some reason, this makes it less laggy?
+            # print('webcam') # for some reason, this makes it less laggy?
             if config.frame is not None:
                 cv_img = config.frame
                 self.change_pixmap_signal.emit(cv_img)

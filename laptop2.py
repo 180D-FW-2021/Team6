@@ -32,6 +32,7 @@ import pytesseract
 process_text_mutex = threading.Lock()
 pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
 
+client = None
 
 def test_text_recognition():
     sampletextfile = []
@@ -62,26 +63,26 @@ def test_text_recognition():
 #     speechtts.process_text()
 #     config.gotImage = 0
 
-def image_test():
-    img = cv2.imread("image1.jpg", cv2.IMREAD_COLOR)
-    config.ImagePass = "image1.jpg"
-    process_text_mutex.acquire()
-    gray_image = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    kernel = np.ones((1, 1), np.uint8)
-    nn = cv2.dilate(gray_image, kernel, iterations=1)
-    kernel = np.ones((1, 1), np.uint8)
-    nn = cv2.erode(gray_image, kernel, iterations=1)
-    nn = cv2.morphologyEx(gray_image, cv2.MORPH_CLOSE, kernel)
-    nn = cv2.medianBlur(gray_image, 3)
-    cv2.imwrite("image1_processed.jpg", nn)
-
-    # save the processed text in 'text' to send with mqtt
-    text = pytesseract.image_to_string(nn)
-    config.gotImage = 1
-    config.sampleText = text
-    process_text_mutex.release()
-    speechtts.process_text()
-    config.gotImage = 0
+# def image_test():
+#     img = cv2.imread("image1.jpg", cv2.IMREAD_COLOR)
+#     config.ImagePass = "image1.jpg"
+#     process_text_mutex.acquire()
+#     gray_image = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+#     kernel = np.ones((1, 1), np.uint8)
+#     nn = cv2.dilate(gray_image, kernel, iterations=1)
+#     kernel = np.ones((1, 1), np.uint8)
+#     nn = cv2.erode(gray_image, kernel, iterations=1)
+#     nn = cv2.morphologyEx(gray_image, cv2.MORPH_CLOSE, kernel)
+#     nn = cv2.medianBlur(gray_image, 3)
+#     cv2.imwrite("image1_processed.jpg", nn)
+# 
+#     # save the processed text in 'text' to send with mqtt
+#     text = pytesseract.image_to_string(nn)
+#     config.gotImage = 1
+#     config.sampleText = text
+#     process_text_mutex.release()
+#     speechtts.process_text()
+#     config.gotImage = 0
 # 0. define callbacks - functions that run when events happen.
 # The callback for when the client receives a CONNACK response from the server.
 
@@ -106,33 +107,39 @@ def on_disconnect(client, userdata, rc):
 # (you can create separate callbacks per subscribed topic)
 
 
-# def on_message(client, userdata, message):
-#     text_file = open("sample.txt", "wt")
-#     n = text_file.write('Received message: "' + str(message.payload) + '"on topic "' +
-#                         message.topic + '" with QoS ' + str(message.qos))
-#     text_file.close()
-#     #sampletextfile = open(sys.argv[1], "r")
-#     sampletextfile = open("sample.txt", "r")
-#     sampleText = sampletextfile.read()
-#     speechtts.process_text()
-
-
 def on_message(client, userdata, message):
-    img = cv2.imread("image1.jpg", cv2.IMREAD_COLOR)
+    # text_file = open("sample.txt", "wt")
+    # n = text_file.write('Received message: "' + str(message.payload) + '"on topic "' +
+    #                    message.topic + '" with QoS ' + str(message.qos))
+    # text_file.close()
+    # sampletextfile = open(sys.argv[1], "r")
+    # sampletextfile = open("sample.txt", "r")
+    # sampleText = sampletextfile.read()
+    
+    print( "message received" )
+    print(str(message.payload))
     process_text_mutex.acquire()
-    config.ImagePass = "image1.jpg"
-    # save the processed text in 'text' to send with mqtt
-    text = pytesseract.image_to_string(img)
-    config.gotImage = 1
-    config.sampleText = text
+    config.sampleText.append(str(message.payload))
     process_text_mutex.release()
     speechtts.process_text()
+
+
+# def on_message(client, userdata, message):
+#    img = cv2.imread("image1.jpg", cv2.IMREAD_COLOR)
+#    process_text_mutex.acquire()
+#    config.ImagePass = "image1.jpg"
+#    # save the processed text in 'text' to send with mqtt
+#    text = pytesseract.image_to_string(img)
+#    config.gotImage = 1
+#    config.sampleText = text
+#    process_text_mutex.release()
+#    speechtts.process_text()
 
 
 def text_recognition():
     # 1. create a client instance.
     client = mqtt.Client()
-    # add additional client options (security, certifications, etc.)
+    # add additional clientoptions (security, certifications, etc.)
     # many default options should be good to start off.
     # add callbacks to client.
 
@@ -142,15 +149,15 @@ def text_recognition():
 
     # 2. connect to a broker using one of the connect*() functions.5
 
-    client.connect_async('mqtt.eclipseprojects.io')
+    client.connect_async('test.mosquitto.org')
     # client.connect("mqtt.eclipse.org")
 
     # 3. call one of the loop*() functions to maintain network traffic flow with the broker.
     client.loop_start()
     # client.loop_forever()
 
-    # while True:
-    #     pass
+    while True:
+        pass
 
     # use subscribe() to subscribe to a topic and receive messages.
 
@@ -174,19 +181,19 @@ def main():
     t2 = threading.Thread(target=speechtts.speech, args=()) 
     t3 = threading.Thread(target=pose.loop, args=(speechtts.read, speechtts.pause)) 
     t4 = threading.Thread(target=speechtts.tts, args=())
-    t5 = threading.Thread(target=image_test(), args=())
+    t5 = threading.Thread(target=text_recognition, args=())
  
+    t5.start()
     t1.start()
     t2.start()
     t3.start()
     t4.start()
-    t5.start()
 
     t1.join()
     t2.join()
     t3.join()
     t4.join()
-    t5.start()
+    t5.join()
 
     pose.cleanup()
     # sys.exit(app.exec_())
