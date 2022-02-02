@@ -28,11 +28,20 @@ import hand_gesture_recognition_code.TechVidvan_hand_gesture_detection as pose
 process_text_mutex = threading.Lock()
 
 def test_text_recognition():
-    sampletextfile = open('speech_tts/testing/sampletext1000')
-    process_text_mutex.acquire()
-    config.sampleText = sampletextfile.read()
-    process_text_mutex.release()
-    speechtts.process_text()
+    sampletextfile = []
+    # sampletextfile.append(open('speech_tts/testing/sampletext'))
+    # sampletextfile.append(open('speech_tts/testing/sampletext1000'))
+    # sampletextfile.append(open('speech_tts/testing/sampletext'))
+    sampletextfile.append(open('speech_tts/testing/sampletext_short1'))
+    sampletextfile.append(open('speech_tts/testing/sampletext_short2'))
+    sampletextfile.append(open('speech_tts/testing/sampletext_short3'))
+    while (1):
+        if len(sampletextfile) > 0:
+            process_text_mutex.acquire()
+            config.sampleText.append(sampletextfile[0].read())
+            sampletextfile.pop(0)
+            process_text_mutex.release()
+            speechtts.process_text()
 
 # 0. define callbacks - functions that run when events happen.
 # The callback for when the client receives a CONNACK response from the server.
@@ -103,18 +112,21 @@ def main():
     pose.init(path)
 
     t1 = threading.Thread(target=test_text_recognition, args=()) 
-    t2 = threading.Thread(target=speechtts.speech_and_text, args=()) 
+    t2 = threading.Thread(target=speechtts.speech, args=()) 
     t3 = threading.Thread(target=pose.loop, args=(speechtts.read, speechtts.pause)) 
+    t4 = threading.Thread(target=speechtts.tts, args=()) 
 
     t1.start()
     t2.start()
     t3.start()
+    t4.start()
 
     t1.join()
     t2.join()
     t3.join()
+    t4.join()
 
-    pose.cleanup()
+    # pose.cleanup()
 
 if __name__ == '__main__':
     main()
