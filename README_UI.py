@@ -92,7 +92,7 @@ class App(QWidget):
         self.Run.setGeometry(QtCore.QRect(225, 685, 250, 41))
         self.Run.resize(250, 75)
         self.Run.setFont(QFont('Times', 15))
-        self.Run.clicked.connect(self.extractText)
+        self.Run.clicked.connect(self.updateScreen)
 
         self.Clear = QPushButton("Clear", self)
         self.Clear.setObjectName("Clear")
@@ -214,6 +214,7 @@ class App(QWidget):
         self.textEdit.append(text)
 
     def updateScreen(self):
+        print(config.sampleText)
         self.setText(config.sampleText)
         self.setImage(config.ImagePass)
 

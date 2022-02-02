@@ -117,32 +117,33 @@ def on_disconnect(client, userdata, rc):
 #    speechtts.process_text()
 
 # with image
-def on_message(client, userdata, message):
-    img = cv2.imread("image1.jpg", cv2.IMREAD_COLOR)
-    process_text_mutex.acquire()
-    config.ImagePass = "image1.jpg"
-    # save the processed text in 'text' to send with mqtt
-    text = pytesseract.image_to_string(img)
-    config.gotImage = 1
-    config.sampleText.append(text)
-    process_text_mutex.release()
-    speechtts.process_text()
-
-
 # def on_message(client, userdata, message):
-#     f = open('receive.jpg', 'wb')
-#     f.write(message.payload)
-#     f.close()
-#     print('image received')
-#     img = cv2.imread("receive.jpg", cv2.IMREAD_COLOR)
-#     text = pytesseract.image_to_string(img)
+#     img = cv2.imread("image1.jpg", cv2.IMREAD_COLOR)
 #     process_text_mutex.acquire()
-#     config.ImagePass = "receive.jpg"
-#     #config.sampleText = text
+#     config.ImagePass = "image1.jpg"
+#     # save the processed text in 'text' to send with mqtt
+#     text = pytesseract.image_to_string(img)
+#     config.gotImage = 1
 #     config.sampleText.append(text)
-
 #     process_text_mutex.release()
 #     speechtts.process_text()
+
+
+def on_message(client, userdata, message):
+    f = open('receive.jpg', 'wb')
+    f.write(message.payload)
+    f.close()
+    print('image received')
+    img = cv2.imread("receive.jpg", cv2.IMREAD_COLOR)
+    text = pytesseract.image_to_string(img)
+    print(text)
+    process_text_mutex.acquire()
+    config.ImagePass = "receive.jpg"
+    config.sampleText = text
+    # config.sampleText.append(text)
+
+    process_text_mutex.release()
+    speechtts.process_text()
 
 
 def text_recognition():
