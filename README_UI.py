@@ -225,12 +225,6 @@ def setup():
     c.setColor(a.backgroundRole(), Qt.gray)
     a.setPalette(c)
     a.show()
-    if config.gotImage == 1:
-        #a.setText("THis is a test")
-        print("gets here")
-        print("%d" % config.gotImage)
-        a.setImage(config.ImagePass)
-        a.setText(config.sampleText)
     sys.exit(app.exec_())
 
     # app.exec_()

@@ -34,6 +34,7 @@ pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tessera
 
 client = None
 
+
 def test_text_recognition():
     sampletextfile = []
     # sampletextfile.append(open('speech_tts/testing/sampletext'))
@@ -75,7 +76,7 @@ def test_text_recognition():
 #     nn = cv2.morphologyEx(gray_image, cv2.MORPH_CLOSE, kernel)
 #     nn = cv2.medianBlur(gray_image, 3)
 #     cv2.imwrite("image1_processed.jpg", nn)
-# 
+#
 #     # save the processed text in 'text' to send with mqtt
 #     text = pytesseract.image_to_string(nn)
 #     config.gotImage = 1
@@ -117,15 +118,31 @@ def on_disconnect(client, userdata, rc):
 
 # with image
 def on_message(client, userdata, message):
-   img = cv2.imread("image1.jpg", cv2.IMREAD_COLOR)
-   process_text_mutex.acquire()
-   config.ImagePass = "image1.jpg"
-   # save the processed text in 'text' to send with mqtt
-   text = pytesseract.image_to_string(img)
-   config.gotImage = 1
-   config.sampleText.append(text)
-   process_text_mutex.release()
-   speechtts.process_text()
+    img = cv2.imread("image1.jpg", cv2.IMREAD_COLOR)
+    process_text_mutex.acquire()
+    config.ImagePass = "image1.jpg"
+    # save the processed text in 'text' to send with mqtt
+    text = pytesseract.image_to_string(img)
+    config.gotImage = 1
+    config.sampleText.append(text)
+    process_text_mutex.release()
+    speechtts.process_text()
+
+
+# def on_message(client, userdata, message):
+#     f = open('receive.jpg', 'wb')
+#     f.write(message.payload)
+#     f.close()
+#     print('image received')
+#     img = cv2.imread("receive.jpg", cv2.IMREAD_COLOR)
+#     text = pytesseract.image_to_string(img)
+#     process_text_mutex.acquire()
+#     config.ImagePass = "receive.jpg"
+#     #config.sampleText = text
+#     config.sampleText.append(text)
+
+#     process_text_mutex.release()
+#     speechtts.process_text()
 
 
 def text_recognition():
@@ -170,11 +187,12 @@ def main():
     pose.init(path)
 
     t1 = threading.Thread(target=UI.setup, args=())
-    t2 = threading.Thread(target=speechtts.speech, args=()) 
-    t3 = threading.Thread(target=pose.loop, args=(speechtts.read, speechtts.pause)) 
+    t2 = threading.Thread(target=speechtts.speech, args=())
+    t3 = threading.Thread(target=pose.loop, args=(
+        speechtts.read, speechtts.pause))
     t4 = threading.Thread(target=speechtts.tts, args=())
     t5 = threading.Thread(target=text_recognition, args=())
- 
+
     t5.start()
     t1.start()
     t2.start()
@@ -190,6 +208,7 @@ def main():
     pose.cleanup()
     # sys.exit(app.exec_())
     # sys.exit()
+
 
 if __name__ == '__main__':
     main()
