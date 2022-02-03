@@ -134,6 +134,7 @@ def on_message(client, userdata, message):
     f.write(message.payload)
     f.close()
     print('image received')
+
     img = cv2.imread("receive.jpg", cv2.IMREAD_COLOR)
     text = pytesseract.image_to_string(img)
     print(text)
@@ -145,6 +146,35 @@ def on_message(client, userdata, message):
 
     process_text_mutex.release()
     speechtts.process_text()
+
+# def on_message(client, userdata, message):
+#     f = open('receive.jpg', 'wb')
+#     f.write(message.payload)
+#     f.close()
+#     print('image received')
+
+#     img = cv2.imread("receive.jpg", cv2.IMREAD_COLOR)
+
+#     process_text_mutex.acquire()
+#     gray_image = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+#     kernel = np.ones((1, 1), np.uint8)
+#     nn = cv2.dilate(gray_image, kernel, iterations=1)
+#     kernel = np.ones((1, 1), np.uint8)
+#     nn = cv2.erode(gray_image, kernel, iterations=1)
+#     nn = cv2.morphologyEx(gray_image, cv2.MORPH_CLOSE, kernel)
+#     nn = cv2.medianBlur(gray_image, 3)
+#     cv2.imwrite("receive.jpg_processed.jpg", nn)
+#     text = pytesseract.image_to_string(nn)
+
+#     print(text)
+#     process_text_mutex.acquire()
+#     config.ImagePass = "receive.jpg"
+#     #config.sampleText = text
+#     config.start = 1
+#     config.sampleText.append(text)
+
+#     process_text_mutex.release()
+#     speechtts.process_text()
 
 
 def text_recognition():
