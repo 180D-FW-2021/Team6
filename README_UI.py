@@ -96,7 +96,7 @@ class App(QWidget):
         self.Run.setGeometry(QtCore.QRect(225, 685, 250, 41))
         self.Run.resize(250, 75)
         self.Run.setFont(QFont('Times', 15))
-        self.Run.clicked.connect(self.updateScreen)
+        self.Run.clicked.connect(self.extractText)
 
         self.Clear = QPushButton("Clear", self)
         self.Clear.setObjectName("Clear")
