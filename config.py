@@ -7,3 +7,5 @@ gotImage = 0
 ImagePass = None
 cap = None
 frame = None
+
+start = 0
