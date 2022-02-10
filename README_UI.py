@@ -51,7 +51,7 @@ class App(QWidget):
 
         timer = QTimer(self)
         timer.timeout.connect(self.updateScreen)
-        timer.start(10000)
+        timer.start(10)
 
         # Image area ---------------------------------------------------
         self.labelImage = QLabel(self)
