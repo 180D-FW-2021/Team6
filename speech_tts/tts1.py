@@ -67,7 +67,7 @@ def process_text():
         pass
     global engine, count
     config.outfile.append("temp%s.wav" % str(count))
-    engine.setProperty('rate', 100)
+    engine.setProperty('rate', 120)
     engine.save_to_file(config.sampleText[count], config.outfile[count])
     engine.runAndWait()
     count += 1

@@ -25,7 +25,7 @@ class VideoThread(QThread):
         # capture from web cam
         # cap = cv2.VideoCapture(0)
         while self._run_flag:
-            print('webcam') # for some reason, this makes it less laggy?
+            # print('webcam') # for some reason, this makes it less laggy?
             if config.frame is not None:
                 cv_img = config.frame
                 self.change_pixmap_signal.emit(cv_img)
@@ -48,6 +48,10 @@ class App(QWidget):
         pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
         self.setWindowTitle("READEME")
         self.resize(1920, 1080)
+
+        timer = QTimer(self)
+        timer.timeout.connect(self.updateScreen)
+        timer.start(10000)
 
         # Image area ---------------------------------------------------
         self.labelImage = QLabel(self)
@@ -211,7 +215,24 @@ class App(QWidget):
         self.window.show()
 
     def setText(self, text):
-        self.textEdit.append(text)
+        #strC = self.listToString(text)
+        strC = text[-1]
+        self.textEdit.append(strC)
+
+    def updateScreen(self):
+        if config.start == 1:
+            print(config.sampleText)
+            self.setText(config.sampleText)
+            self.setImage(config.ImagePass)
+            config.start = 0
+
+    def listToString(self, s):
+
+        # initialize an empty string
+        str1 = " "
+
+        # return string
+        return (str1.join(s))
 
 
 def setup():
@@ -221,14 +242,7 @@ def setup():
     c.setColor(a.backgroundRole(), Qt.gray)
     a.setPalette(c)
     a.show()
-    if config.gotImage == 1:
-        #a.setText("THis is a test")
-        print("gets here")
-        print("%d" % config.gotImage)
-        a.setImage(config.ImagePass)
-        a.setText(config.sampleText)
     sys.exit(app.exec_())
-
 
     # app.exec_()
     # sys.exit()

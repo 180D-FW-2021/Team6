@@ -11,8 +11,6 @@ then
     pip install pytesseract 
     pip install numpy
     pip install opencv-python
-    '''  
-    other possible ones:
     pip install opencv-contrib-python
     pip install pyttsx3
     pip install speechRecognition
@@ -22,12 +20,13 @@ then
     pip install --upgrade tensorflow
     pip install paho-mqtt
     pip install pywin32
-    '''
-
+    pip install PyQt5
+    
 fi
 
 #run 
 if [ "$1" -eq "1" ] || [ "$1" -eq "2" ]
 then 
     echo "Run code"
+    python laptop2.py 
 fi

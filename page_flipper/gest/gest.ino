@@ -1,21 +1,7 @@
-/*
-  IMU Classifier
-  This example uses the on-board IMU to start reading acceleration and gyroscope
-  data from on-board IMU, once enough samples are read, it then uses a
-  TensorFlow Lite (Micro) model to try to classify the movement as a known gesture.
-  Note: The direct use of C/C++ pointers, namespaces, and dynamic memory is generally
-        discouraged in Arduino examples, and in the future the TensorFlowLite library
-        might change to make the sketch simpler.
-  The circuit:
-  - Arduino Nano 33 BLE or Arduino Nano 33 BLE Sense board.
-  Created by Don Coleman, Sandeep Mistry
-  Modified by Dominic Pajak, Sandeep Mistry
-  This example code is in the public domain.
-*/
-
-#include <Arduino_LSM9DS1.h>
 #include <ArduinoBLE.h>
 
+#include <Arduino_LSM9DS1.h>
+ 
 #include <TensorFlowLite.h>
 #include <tensorflow/lite/micro/all_ops_resolver.h>
 #include <tensorflow/lite/micro/micro_error_reporter.h>
@@ -23,13 +9,12 @@
 #include <tensorflow/lite/schema/schema_generated.h>
 #include <tensorflow/lite/version.h>
 
-#include "model.h"
+#include "model.h" //tensorflow data
 
-BLEService nano33Service("b445885e-44e2-11ec-81d3-0242ac130003"); // BLE LED Service
+BLEByteCharacteristic* gestureCharacteristic = nullptr;
+BLEService* bleService = nullptr;
 
-// BLE LED Switch Characteristic - custom 128-bit UUID, read and writable by central
-BLEByteCharacteristic gestureCharacteristic("b4458c64-44e2-11ec-81d3-0242ac130003", BLERead | BLEWrite);
-
+long previousMillis = 0;
 
 const float accelerationThreshold = 2.5; // threshold of significant in G's
 const int numSamples = 119;
@@ -56,23 +41,42 @@ byte tensorArena[tensorArenaSize] __attribute__((aligned(16)));
 
 // array to map gesture index to a name
 const char* GESTURES[] = {
-  "punch",
-  "flex",
-  "wave",
-};
+  "punch", 
+  "flex", 
+  "wave", };
 
 #define NUM_GESTURES (sizeof(GESTURES) / sizeof(GESTURES[0]))
 
-void setup() {
-  Serial.begin(9600);
-  while (!Serial);
+int a=0; // count
 
-  // initialize the IMU
+void setup() {
+
+ bleService = new BLEService("180F");
+ gestureCharacteristic = new BLEByteCharacteristic("2A19", BLERead | BLEWrite);
+
+ Serial.begin(9600);
   if (!IMU.begin()) {
-    Serial.println("Failed to initialize IMU!");
+    Serial.println("LSM9DS1 failed!");
     while (1);
   }
 
+  if (!BLE.begin()) {
+    Serial.println("starting BLE failed!");
+    while (1);
+  }
+
+  // set advertised local name and service UUID:
+  BLE.setAdvertisedService(*bleService); // add the service UUID
+  bleService->addCharacteristic(*gestureCharacteristic);
+  BLE.addService(*bleService);
+  // start advertising
+  BLE.setLocalName("yschul");
+  // set the initial value for the characeristic:
+  gestureCharacteristic->writeValue(0);
+  // start advertising
+  BLE.advertise();
+  Serial.println("BLE LED Peripheral");
+ 
   // print out the samples rates of the IMUs
   Serial.print("Accelerometer sample rate = ");
   Serial.print(IMU.accelerationSampleRate());
@@ -80,7 +84,6 @@ void setup() {
   Serial.print("Gyroscope sample rate = ");
   Serial.print(IMU.gyroscopeSampleRate());
   Serial.println(" Hz");
-
   Serial.println();
 
   // get the TFL representation of the model byte array
@@ -89,63 +92,36 @@ void setup() {
     Serial.println("Model schema mismatch!");
     while (1);
   }
-
   // Create an interpreter to run the model
   tflInterpreter = new tflite::MicroInterpreter(tflModel, tflOpsResolver, tensorArena, tensorArenaSize, &tflErrorReporter);
-
+ 
   // Allocate memory for the model's input and output tensors
   tflInterpreter->AllocateTensors();
-
+ 
   // Get pointers for the model's input and output tensors
   tflInputTensor = tflInterpreter->input(0);
   tflOutputTensor = tflInterpreter->output(0);
-
-   // begin initialization
-  if (!BLE.begin()) {
-    Serial.println("starting BLE failed!");
-
-    while (1);
-  }
-
-  // set advertised local name and service UUID:
-  BLE.setDeviceName("NANO33BLE");
-  BLE.setLocalName("BLESERVICE");
-  BLE.setAdvertisedService(nano33Service);
-
-  // add the characteristic to the service
-  nano33Service.addCharacteristic(gestureCharacteristic);
-
-  // add service
-  BLE.addService(nano33Service);
-
-  // set the initial value for the characeristic:
-  //accelerometerCharacteristic.writeValue(80.00);
-  //proximityCharacteristic.writeValue(100.00);
-
-  // start advertising
-  BLE.advertise();
-
-  Serial.println("BLE Peripheral");
-  Serial.println( BLE.address());
-  
 }
 
+//String Level_String;
+float aX, aY, aZ, gX, gY, gZ;
+
+boolean active = false;
+
 void loop() {
-  float aX, aY, aZ, gX, gY, gZ;
-   BLEDevice central = BLE.central();
 
-if (central) {
-    Serial.print("Connected to central: ");
-    // print the central's MAC address:
-    Serial.println(central.address());
-
-    // while the central is still connected to peripheral:
-    while (central.connected()) {
-      // if the remote device wrote to the characteristic,
-      // use the value to control the LED:
-
+  // listen for BLE peripherals to connect:
+  BLEDevice central = BLE.central();
+  // if a central is connected to peripheral:
+  if (central)
+  {
+    Serial.println("Bluetooth connected");
+    while (central.connected())
+    {
+      // bluetooth device is connected
+      
       // wait for significant motion
-      while (samplesRead == numSamples) {
+      if(active == false && samplesRead == numSamples) {
         if (IMU.accelerationAvailable()) {
           // read the acceleration data
           IMU.readAcceleration(aX, aY, aZ);
@@ -157,14 +133,20 @@ if (central) {
           if (aSum >= accelerationThreshold) {
             // reset the sample read count
             samplesRead = 0;
-            break;
+            active = true;
           }
         }
+
+         if(central.connected()){
+               // write to bluetooth
+               gestureCharacteristic->writeValue((byte)0x00);
+         }
+         delay(10);
       }
-    
+      
       // check if the all the required samples have been read since
       // the last time the significant motion was detected
-      while (samplesRead < numSamples) {
+      if (active == true && samplesRead < numSamples) {
         // check if new acceleration AND gyroscope data is available
         if (IMU.accelerationAvailable() && IMU.gyroscopeAvailable()) {
           // read the acceleration and gyroscope data
@@ -183,6 +165,7 @@ if (central) {
           samplesRead++;
     
           if (samplesRead == numSamples) {
+            active = false;
             // Run inferencing
             TfLiteStatus invokeStatus = tflInterpreter->Invoke();
             if (invokeStatus != kTfLiteOk) {
@@ -190,40 +173,50 @@ if (central) {
               while (1);
               return;
             }
-    
+
+            // Counts if accuracy is 0.7 or higher
+           if(tflOutputTensor->data.f[0] >= 0.7){
+             // do something
+             Serial.println("punch");
+             if(central.connected()){
+               // write to bluetooth
+               gestureCharacteristic->writeValue((byte)0x01);
+             }
+           }
+           else if(tflOutputTensor->data.f[1] >= 0.7){
+             // do something
+             Serial.println("flex");
+             if(central.connected()){
+               // write to bluetooth
+               gestureCharacteristic->writeValue((byte)0x10);
+             }
+           }
+           else if(tflOutputTensor->data.f[2] >= 0.7){
+             // do something
+             Serial.println("wave");
+             if(central.connected()){
+               // write to bluetooth
+               gestureCharacteristic->writeValue((byte)0x11);
+             }
+           }
+           else 
+           {
+               if(central.connected()){
+               // write to bluetooth
+               gestureCharacteristic->writeValue((byte)0x00);
+             }
+            
+           }
+            delay(1000); 
             // Loop through the output tensor values from the model
-            for (int i = 0; i < NUM_GESTURES; i++) {
-              Serial.print(GESTURES[i]);
-              Serial.print(": ");
-              float confidence = tflOutputTensor->data.f[i]; 
-              Serial.println(tflOutputTensor->data.f[i], 6);
-              if (GESTURES[i] == "wave" && confidence > 0.7) 
-              {
-                  //send byte 
-                  gestureCharacteristic.writeValue((byte)0x01);
-                  
-              }
-              else if (GESTURES[i] == "punch" && confidence > 0.7) 
-              {
-                  //send byte 
-                  gestureCharacteristic.writeValue((byte)0x10); 
-              }
-              else if (GESTURES[i] == "flex" && confidence > 0.7)
-              {
-                 gestureCharacteristic.writeValue((byte)0x11);
-              }
-              else 
-              {
-                 gestureCharacteristic.writeValue((byte)0x00);
-              }
-            }
+            Serial.print(GESTURES[1]); // GESTURES[0] = flex
+            Serial.print(": ");
+            Serial.println(tflOutputTensor->data.f[1], 6);       
             Serial.println();
           }
-       }
+        }
+      }     
     }
-   }
-    // when the central disconnects, print it out:
-    Serial.print(F("Disconnected from central: "));
-    Serial.println(central.address());
+    Serial.println("Bluetooth disconnected");
   }
 }
