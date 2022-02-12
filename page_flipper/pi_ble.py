@@ -15,7 +15,7 @@ def handle_data(handle, value):
 try:
     adapter.start()
     device = adapter.connect('91:2a:70:0e:41:e3')
-    device.subscribe("2A19",callback=handle_data)
+    device.subscribe("2a19",callback=handle_data)
 
 finally:
     adapter.stop()
