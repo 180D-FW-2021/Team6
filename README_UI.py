@@ -162,20 +162,53 @@ class App(QWidget):
         if self.fileName:
             print(self.fileName)
             self.img = cv2.imread(self.fileName)
+            #1 GRAY
             self.gray_image = cv2.cvtColor(self.img, cv2.COLOR_BGR2GRAY)
             cv2.imwrite("gray.jpg", self.gray_image)
-            #thresh, self.im_bw = cv2.threshold(self.gray_image, 210, 230, cv2.THRESH_BINARY)
-            #cv2.imwrite("bw_image.jpg", self.im_bw)
+            #2 BW
+            #thresh, self.bw = cv2.threshold(self.gray_image, 210, 230, cv2.THRESH_BINARY)
+            thresh, self.bw = cv2.threshold(self.gray_image, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+            cv2.imwrite("bw_image.jpg", self.bw)
+
+            ##########
+            #3 GRAY-> BLACK and WHITE -> DILATION
+            self.bt = cv2.bitwise_not(self.bw)
+            kernel = np.ones((1,1),np.uint8) #increase 2,2 to 3,3 for stronger dilation, 5,5 is too
+            self.bt = cv2.dilate(self.bt, kernel, iterations=1)
+            self.bt = cv2.bitwise_not(self.bt)
+
+            #4 GRAY-> BLACK and WHITE -> DILATION -> NOISE REMOVAL
+            '''
             kernel = np.ones((1, 1), np.uint8)
-            self.nn = cv2.dilate(self.gray_image, kernel, iterations=1)
-            kernel = np.ones((1, 1), np.uint8)
-            self.nn = cv2.erode(self.gray_image, kernel, iterations=1)
-            self.nn = cv2.morphologyEx(
-                self.gray_image, cv2.MORPH_CLOSE, kernel)
-            self.nn = cv2.medianBlur(self.gray_image, 3)
-            cv2.imwrite("no_noise.jpg", self.nn)
+            self.nn = cv2.dilate(self.bt, kernel, iterations=1)
+            self.nn = cv2.erode(self.nn, kernel, iterations=1)
+            self.nn = cv2.morphologyEx(self.nn, cv2.MORPH_CLOSE, kernel)
+            self.nn = cv2.medianBlur(self.nn, 3)'''
+
+            #5 Noise removal and erosion
+            # GRAY > BLACK WHITE#2 > NOISE REMOVAL
+            '''kernel = np.ones((1, 1), np.uint8)
+            self.nn = cv2.dilate(self.bw, kernel, iterations=1)
+            self.nn = cv2.erode(self.nn, kernel, iterations=1)
+            self.nn = cv2.morphologyEx(self.nn, cv2.MORPH_CLOSE, kernel)
+            self.nn = cv2.medianBlur(self.nn, 3)'''
+            # Dilation
+
+            # GRAY > BLACK WHITE > NOISE REMOVAL > DILATION
+            '''self.bt = cv2.bitwise_not(self.nn)
+            kernel = np.ones((2,2),np.uint8) #increase 2,2 to 3,3 for stronger dilation, 5,5 is too
+            self.bt = cv2.dilate(self.bt, kernel, iterations=1)
+            self.bt = cv2.bitwise_not(self.bt)'''
+            # GRAY > BLACK WHITE > DILATION
+            '''self.bt = cv2.bitwise_not(self.bw)
+            kernel = np.ones((2,2),np.uint8) #increase 2,2 to 3,3 for stronger dilation, 5,5 is too
+            self.bt = cv2.dilate(self.bt, kernel, iterations=1)
+            self.bt = cv2.bitwise_not(self.bt)'''
+            #cv2.imwrite("no_noise.jpg", self.nn)
+            cv2.imwrite("dilated.jpg", self.bt)
             pattern = ".(jpg|png|jpeg|bmp|jpe|tiff)$"
-            self.fileName2 = "no_noise.jpg"
+            self.fileName2 = "dilated.jpg"
+            #self.fileName2 = "no_noise.jpg"
             if re.search(pattern, self.fileName2):
                 # self.setImage(self.fileName)
                 self.setImage(self.fileName)
