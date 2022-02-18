@@ -13,6 +13,9 @@ from PyQt5.QtCore import *
 from UI.Instructions_Pop_up import Ui_MainWindow
 #from UI.Instructions_Pop_up import *
 
+from PIL import Image 
+import PIL
+import os 
 
 class VideoThread(QThread):
     change_pixmap_signal = pyqtSignal(np.ndarray)
@@ -86,39 +89,46 @@ class App(QWidget):
         # Buttons ------------------------------------------------------------
         self.Loadimage = QPushButton("Load Image", self)
         self.Loadimage.setObjectName("Load Image")
-        self.Loadimage.setGeometry(QtCore.QRect(225, 610, 250, 41))
+        self.Loadimage.setGeometry(QtCore.QRect(225, 560, 250, 41))
         self.Loadimage.resize(250, 75)
         self.Loadimage.setFont(QFont('Times', 15))
         self.Loadimage.clicked.connect(self.getImage)
 
         self.Run = QPushButton("Run", self)
         self.Run.setObjectName("Run")
-        self.Run.setGeometry(QtCore.QRect(225, 685, 250, 41))
+        self.Run.setGeometry(QtCore.QRect(225, 635, 250, 41))
         self.Run.resize(250, 75)
         self.Run.setFont(QFont('Times', 15))
         self.Run.clicked.connect(self.extractText)
 
         self.Clear = QPushButton("Clear", self)
         self.Clear.setObjectName("Clear")
-        self.Clear.setGeometry(QtCore.QRect(225, 760, 250, 41))
+        self.Clear.setGeometry(QtCore.QRect(225, 710, 250, 41))
         self.Clear.resize(250, 75)
         self.Clear.setFont(QFont('Times', 15))
         self.Clear.clicked.connect(self.clearText)
 
         self.Save = QPushButton("Save text", self)
         self.Save.setObjectName("Save text")
-        self.Save.setGeometry(QtCore.QRect(225, 835, 250, 41))
+        self.Save.setGeometry(QtCore.QRect(225, 785, 250, 41))
         self.Save.resize(250, 75)
         self.Save.setFont(QFont('Times', 15))
         self.Save.clicked.connect(self.saveText)
 
+        self.SaveImage = QPushButton("Save Image", self)
+        self.SaveImage.setObjectName("Save Image")
+        self.SaveImage.setGeometry(QtCore.QRect(225, 860, 250, 41))
+        self.SaveImage.resize(250, 75)
+        self.SaveImage.setFont(QFont('Times', 15))
+        self.SaveImage.clicked.connect(self.saveImage)
+
+
         self.Instructions = QPushButton("Instructions", self)
         self.Instructions.setObjectName("Instructions")
-        self.Instructions.setGeometry(QtCore.QRect(225, 910, 250, 41))
+        self.Instructions.setGeometry(QtCore.QRect(225, 935, 250, 41))
         self.Instructions.resize(250, 75)
         self.Instructions.setFont(QFont('Times', 15))
         self.Instructions.clicked.connect(self.openWindow)
-
         # self.Exit = QPushButton("Exit", self)
         # self.Exit.setObjectName("Exit")
         # self.Exit.setGeometry(QtCore.QRect(30, 860, 171, 41))
@@ -240,6 +250,21 @@ class App(QWidget):
             text = self.textEdit.toPlainText()
             file.write(text)
             file.close()
+
+    def saveImage(self):
+        fileName, _ = QFileDialog.getSaveFileName(self)
+        if fileName:
+            split_tup = os.path.splitext(fileName)
+            pixmap = self.labelImage.pixmap()
+            if pixmap is not None and fileName:
+                if not split_tup[1]:
+                    jpg ='.jpg'
+                    pixmap.save(fileName+jpg)    
+                else:
+                    pixmap.save(fileName)
+        
+            
+
 
     def openWindow(self):
         self.window = QtWidgets.QMainWindow()
