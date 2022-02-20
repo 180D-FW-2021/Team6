@@ -89,24 +89,54 @@ class App(QWidget):
         # Buttons ------------------------------------------------------------
         self.Loadimage = QPushButton("Load Image", self)
         self.Loadimage.setObjectName("Load Image")
-        self.Loadimage.setGeometry(QtCore.QRect(225, 560, 250, 41))
+        self.Loadimage.setGeometry(QtCore.QRect(225, 545, 250, 41))
         self.Loadimage.resize(250, 75)
         self.Loadimage.setFont(QFont('Times', 15))
         self.Loadimage.clicked.connect(self.getImage)
+        self.Loadimage.setStyleSheet("""
+        QPushButton {
+            background:rgb(255, 255, 255); 
+            border: 2px solid black;
+            border-radius: 15px;
+        }
+        QPushButton:hover {
+             background-color: lightgreen;
+        }
+        """)
 
         self.Run = QPushButton("Run", self)
         self.Run.setObjectName("Run")
-        self.Run.setGeometry(QtCore.QRect(225, 635, 250, 41))
+        self.Run.setGeometry(QtCore.QRect(225, 625, 250, 41))
         self.Run.resize(250, 75)
         self.Run.setFont(QFont('Times', 15))
         self.Run.clicked.connect(self.extractText)
+        self.Run.setStyleSheet("""
+        QPushButton {
+            background:rgb(255, 255, 255); 
+            border: 2px solid black;
+            border-radius: 15px;
+        }
+        QPushButton:hover {
+             background-color: lightgreen;
+        }
+        """)
 
         self.Clear = QPushButton("Clear", self)
         self.Clear.setObjectName("Clear")
-        self.Clear.setGeometry(QtCore.QRect(225, 710, 250, 41))
+        self.Clear.setGeometry(QtCore.QRect(225, 705, 250, 41))
         self.Clear.resize(250, 75)
         self.Clear.setFont(QFont('Times', 15))
         self.Clear.clicked.connect(self.clearText)
+        self.Clear.setStyleSheet("""
+        QPushButton {
+            background:rgb(255, 255, 255); 
+            border: 2px solid black;
+            border-radius: 15px;
+        }
+        QPushButton:hover {
+             background-color: lightgreen;
+        }
+        """)
 
         self.Save = QPushButton("Save text", self)
         self.Save.setObjectName("Save text")
@@ -114,21 +144,50 @@ class App(QWidget):
         self.Save.resize(250, 75)
         self.Save.setFont(QFont('Times', 15))
         self.Save.clicked.connect(self.saveText)
+        self.Save.setStyleSheet("""
+        QPushButton {
+            background:rgb(255, 255, 255); 
+            border: 2px solid black;
+            border-radius: 15px;
+        }
+        QPushButton:hover {
+             background-color: lightgreen;
+        }
+        """)
 
         self.SaveImage = QPushButton("Save Image", self)
         self.SaveImage.setObjectName("Save Image")
-        self.SaveImage.setGeometry(QtCore.QRect(225, 860, 250, 41))
+        self.SaveImage.setGeometry(QtCore.QRect(225, 865, 250, 41))
         self.SaveImage.resize(250, 75)
         self.SaveImage.setFont(QFont('Times', 15))
         self.SaveImage.clicked.connect(self.saveImage)
-
+        self.SaveImage.setStyleSheet("""
+        QPushButton {
+            background:rgb(255, 255, 255); 
+            border: 2px solid black;
+            border-radius: 15px;
+        }
+        QPushButton:hover {
+             background-color: lightgreen;
+        }
+        """)
 
         self.Instructions = QPushButton("Instructions", self)
         self.Instructions.setObjectName("Instructions")
-        self.Instructions.setGeometry(QtCore.QRect(225, 935, 250, 41))
+        self.Instructions.setGeometry(QtCore.QRect(225, 945, 250, 41))
         self.Instructions.resize(250, 75)
         self.Instructions.setFont(QFont('Times', 15))
         self.Instructions.clicked.connect(self.openWindow)
+        self.Instructions.setStyleSheet("""
+        QPushButton {
+            background:rgb(255, 255, 255); 
+            border: 2px solid black;
+            border-radius: 15px;
+        }
+        QPushButton:hover {
+             background-color: lightgreen;
+        }
+        """)
         # self.Exit = QPushButton("Exit", self)
         # self.Exit.setObjectName("Exit")
         # self.Exit.setGeometry(QtCore.QRect(30, 860, 171, 41))
@@ -137,6 +196,7 @@ class App(QWidget):
         # self.Exit.clicked.connect(self.close)
 
         # Buttons ------------------------------------------------------------
+    
 
     def closeEvent(self, event):
         self.thread.stop()
