@@ -87,13 +87,7 @@ class App(QWidget):
         # Webcam -------------------------------------------------------
 
         # Buttons ------------------------------------------------------------
-        self.Loadimage = QPushButton("Load Image", self)
-        self.Loadimage.setObjectName("Load Image")
-        self.Loadimage.setGeometry(QtCore.QRect(225, 545, 250, 41))
-        self.Loadimage.resize(250, 75)
-        self.Loadimage.setFont(QFont('Times', 15))
-        self.Loadimage.clicked.connect(self.getImage)
-        self.Loadimage.setStyleSheet("""
+        ButtonInfo = """
         QPushButton {
             background:rgb(255, 255, 255); 
             border: 2px solid black;
@@ -102,7 +96,14 @@ class App(QWidget):
         QPushButton:hover {
              background-color: lightgreen;
         }
-        """)
+        """
+        self.Loadimage = QPushButton("Load Image", self)
+        self.Loadimage.setObjectName("Load Image")
+        self.Loadimage.setGeometry(QtCore.QRect(225, 545, 250, 41))
+        self.Loadimage.resize(250, 75)
+        self.Loadimage.setFont(QFont('Times', 15))
+        self.Loadimage.clicked.connect(self.getImage)
+        self.Loadimage.setStyleSheet(ButtonInfo)
 
         self.Run = QPushButton("Run", self)
         self.Run.setObjectName("Run")
@@ -110,16 +111,7 @@ class App(QWidget):
         self.Run.resize(250, 75)
         self.Run.setFont(QFont('Times', 15))
         self.Run.clicked.connect(self.extractText)
-        self.Run.setStyleSheet("""
-        QPushButton {
-            background:rgb(255, 255, 255); 
-            border: 2px solid black;
-            border-radius: 15px;
-        }
-        QPushButton:hover {
-             background-color: lightgreen;
-        }
-        """)
+        self.Run.setStyleSheet(ButtonInfo)
 
         self.Clear = QPushButton("Clear", self)
         self.Clear.setObjectName("Clear")
@@ -127,16 +119,7 @@ class App(QWidget):
         self.Clear.resize(250, 75)
         self.Clear.setFont(QFont('Times', 15))
         self.Clear.clicked.connect(self.clearText)
-        self.Clear.setStyleSheet("""
-        QPushButton {
-            background:rgb(255, 255, 255); 
-            border: 2px solid black;
-            border-radius: 15px;
-        }
-        QPushButton:hover {
-             background-color: lightgreen;
-        }
-        """)
+        self.Clear.setStyleSheet(ButtonInfo)
 
         self.Save = QPushButton("Save text", self)
         self.Save.setObjectName("Save text")
@@ -144,16 +127,7 @@ class App(QWidget):
         self.Save.resize(250, 75)
         self.Save.setFont(QFont('Times', 15))
         self.Save.clicked.connect(self.saveText)
-        self.Save.setStyleSheet("""
-        QPushButton {
-            background:rgb(255, 255, 255); 
-            border: 2px solid black;
-            border-radius: 15px;
-        }
-        QPushButton:hover {
-             background-color: lightgreen;
-        }
-        """)
+        self.Save.setStyleSheet(ButtonInfo)
 
         self.SaveImage = QPushButton("Save Image", self)
         self.SaveImage.setObjectName("Save Image")
@@ -161,16 +135,7 @@ class App(QWidget):
         self.SaveImage.resize(250, 75)
         self.SaveImage.setFont(QFont('Times', 15))
         self.SaveImage.clicked.connect(self.saveImage)
-        self.SaveImage.setStyleSheet("""
-        QPushButton {
-            background:rgb(255, 255, 255); 
-            border: 2px solid black;
-            border-radius: 15px;
-        }
-        QPushButton:hover {
-             background-color: lightgreen;
-        }
-        """)
+        self.SaveImage.setStyleSheet(ButtonInfo)
 
         self.Instructions = QPushButton("Instructions", self)
         self.Instructions.setObjectName("Instructions")
@@ -178,16 +143,7 @@ class App(QWidget):
         self.Instructions.resize(250, 75)
         self.Instructions.setFont(QFont('Times', 15))
         self.Instructions.clicked.connect(self.openWindow)
-        self.Instructions.setStyleSheet("""
-        QPushButton {
-            background:rgb(255, 255, 255); 
-            border: 2px solid black;
-            border-radius: 15px;
-        }
-        QPushButton:hover {
-             background-color: lightgreen;
-        }
-        """)
+        self.Instructions.setStyleSheet(ButtonInfo)
         # self.Exit = QPushButton("Exit", self)
         # self.Exit.setObjectName("Exit")
         # self.Exit.setGeometry(QtCore.QRect(30, 860, 171, 41))
