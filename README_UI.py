@@ -58,22 +58,24 @@ class App(QWidget):
 
         # Image area ---------------------------------------------------
         self.labelImage = QLabel(self)
-        self.labelImage.setGeometry(QtCore.QRect(1000, 50, 711, 470))
+        self.labelImage.setGeometry(QtCore.QRect(1000, 100, 711, 470))
         self.labelImage.setFrameShape(QtWidgets.QFrame.WinPanel)
         self.labelImage.setText("")
         self.labelImage.setObjectName("labelImage")
         self.labelImage.setScaledContents(True)
+        self.labelImage.setStyleSheet("background:rgb(218,217,212);")
         # Image area ---------------------------------------------------
 
         # Text area ------------------------------------------------------
         self.textEdit = QTextEdit(self)
-        self.textEdit.setGeometry(QtCore.QRect(30, 50, 711, 650))
+        self.textEdit.setGeometry(QtCore.QRect(30, 100, 711, 600))
         font = QtGui.QFont()
         font.setPointSize(20)
         self.textEdit.setFont(font)
         self.textEdit.setFrameShape(QtWidgets.QFrame.WinPanel)
         self.textEdit.setFrameShadow(QtWidgets.QFrame.Plain)
         self.textEdit.setObjectName("textEdit")
+        self.textEdit.setStyleSheet("background:rgb(218,217,212);")
         # Text area ------------------------------------------------------
 
         # Webcam -------------------------------------------------------
@@ -89,7 +91,7 @@ class App(QWidget):
         # Buttons ------------------------------------------------------------
         ButtonInfo = """
         QPushButton {
-            background:rgb(255, 255, 255); 
+            background:rgb(218,217,212); 
             border: 2px solid black;
             border-radius: 15px;
         }
@@ -324,7 +326,8 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
     a = App()
     c = a.palette()
-    c.setColor(a.backgroundRole(), QColor(26, 62, 88))
+    #c.setColor(a.backgroundRole(), QColor(26, 62, 88))
+    c.setBrush(QPalette.Background,QBrush(QPixmap("BackgroundImage.png")))
     a.setPalette(c)
     a.show()
     #a.setText("THis is a test")
