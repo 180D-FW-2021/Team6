@@ -58,7 +58,7 @@ class App(QWidget):
 
         # Image area ---------------------------------------------------
         self.labelImage = QLabel(self)
-        self.labelImage.setGeometry(QtCore.QRect(30, 50, 711, 470))
+        self.labelImage.setGeometry(QtCore.QRect(1000, 50, 711, 470))
         self.labelImage.setFrameShape(QtWidgets.QFrame.WinPanel)
         self.labelImage.setText("")
         self.labelImage.setObjectName("labelImage")
@@ -67,7 +67,7 @@ class App(QWidget):
 
         # Text area ------------------------------------------------------
         self.textEdit = QTextEdit(self)
-        self.textEdit.setGeometry(QtCore.QRect(1000, 50, 711, 470))
+        self.textEdit.setGeometry(QtCore.QRect(30, 50, 711, 650))
         font = QtGui.QFont()
         font.setPointSize(20)
         self.textEdit.setFont(font)
@@ -94,12 +94,12 @@ class App(QWidget):
             border-radius: 15px;
         }
         QPushButton:hover {
-             background-color: lightgreen;
+             background-color:rgb(49, 229, 196);
         }
         """
         self.Loadimage = QPushButton("Load Image", self)
         self.Loadimage.setObjectName("Load Image")
-        self.Loadimage.setGeometry(QtCore.QRect(225, 545, 250, 41))
+        self.Loadimage.setGeometry(QtCore.QRect(100, 740, 250, 41))
         self.Loadimage.resize(250, 75)
         self.Loadimage.setFont(QFont('Times', 15))
         self.Loadimage.clicked.connect(self.getImage)
@@ -107,7 +107,7 @@ class App(QWidget):
 
         self.Run = QPushButton("Run", self)
         self.Run.setObjectName("Run")
-        self.Run.setGeometry(QtCore.QRect(225, 625, 250, 41))
+        self.Run.setGeometry(QtCore.QRect(100, 820, 250, 41))
         self.Run.resize(250, 75)
         self.Run.setFont(QFont('Times', 15))
         self.Run.clicked.connect(self.extractText)
@@ -115,7 +115,7 @@ class App(QWidget):
 
         self.Clear = QPushButton("Clear", self)
         self.Clear.setObjectName("Clear")
-        self.Clear.setGeometry(QtCore.QRect(225, 705, 250, 41))
+        self.Clear.setGeometry(QtCore.QRect(100, 900, 250, 41))
         self.Clear.resize(250, 75)
         self.Clear.setFont(QFont('Times', 15))
         self.Clear.clicked.connect(self.clearText)
@@ -123,7 +123,7 @@ class App(QWidget):
 
         self.Save = QPushButton("Save text", self)
         self.Save.setObjectName("Save text")
-        self.Save.setGeometry(QtCore.QRect(225, 785, 250, 41))
+        self.Save.setGeometry(QtCore.QRect(375, 740, 250, 41))
         self.Save.resize(250, 75)
         self.Save.setFont(QFont('Times', 15))
         self.Save.clicked.connect(self.saveText)
@@ -131,7 +131,7 @@ class App(QWidget):
 
         self.SaveImage = QPushButton("Save Image", self)
         self.SaveImage.setObjectName("Save Image")
-        self.SaveImage.setGeometry(QtCore.QRect(225, 865, 250, 41))
+        self.SaveImage.setGeometry(QtCore.QRect(375, 820, 250, 41))
         self.SaveImage.resize(250, 75)
         self.SaveImage.setFont(QFont('Times', 15))
         self.SaveImage.clicked.connect(self.saveImage)
@@ -139,7 +139,7 @@ class App(QWidget):
 
         self.Instructions = QPushButton("Instructions", self)
         self.Instructions.setObjectName("Instructions")
-        self.Instructions.setGeometry(QtCore.QRect(225, 945, 250, 41))
+        self.Instructions.setGeometry(QtCore.QRect(375, 900, 250, 41))
         self.Instructions.resize(250, 75)
         self.Instructions.setFont(QFont('Times', 15))
         self.Instructions.clicked.connect(self.openWindow)
@@ -324,7 +324,7 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
     a = App()
     c = a.palette()
-    c.setColor(a.backgroundRole(), Qt.gray)
+    c.setColor(a.backgroundRole(), QColor(26, 62, 88))
     a.setPalette(c)
     a.show()
     #a.setText("THis is a test")
