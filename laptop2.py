@@ -14,8 +14,8 @@ from PyQt5.QtCore import *
 import README_UI as UI
 # import necessary packages
 
-# import cv2
-# import numpy as np
+import cv2
+import numpy as np
 # import mediapipe as mp
 # import tensorflow as tf
 # from tensorflow.keras.models import load_model
@@ -50,17 +50,15 @@ def test_text_recognition(textqueue):
             # speechtts.process_text()
 
 
-def image_test():
+def image_test(textqueue):
+    config.start=1
+    print('image test start')
     img = cv2.imread("image1.jpg", cv2.IMREAD_COLOR)
-    process_text_mutex.acquire()
     config.ImagePass = "image1.jpg"
-    # save the processed text in 'text' to send with mqtt
     text = pytesseract.image_to_string(img)
     config.gotImage = 1
-    config.sampleText = text
-    process_text_mutex.release()
-    speechtts.process_text()
-    config.gotImage = 0
+    config.sampleText.append(text)
+    textqueue.put(text)
 
 # def image_test():
 #     img = cv2.imread("image1.jpg", cv2.IMREAD_COLOR)
@@ -128,6 +126,7 @@ def on_disconnect(client, userdata, rc):
 
 
 def on_message(client, userdata, message):
+    textqueue = userdata['textqueue']
     f = open('receive.jpg', 'wb')
     f.write(message.payload)
     f.close()
@@ -141,9 +140,9 @@ def on_message(client, userdata, message):
     #config.sampleText = text
     config.start = 1
     config.sampleText.append(text)
+    textqueue.put(text)
 
     process_text_mutex.release()
-    speechtts.process_text(engine)
 
 # def on_message(client, userdata, message):
 #     f = open('receive.jpg', 'wb')
@@ -175,9 +174,10 @@ def on_message(client, userdata, message):
 #     speechtts.process_text()
 
 
-def text_recognition():
+def text_recognition(textqueue):
     # 1. create a client instance.
-    client = mqtt.Client()
+    client_userdata = {'textqueue':textqueue}
+    client = mqtt.Client(userdata=client_userdata)
     # add additional clientoptions (security, certifications, etc.)
     # many default options should be good to start off.
     # add callbacks to client.
@@ -207,6 +207,34 @@ def text_recognition():
     client.disconnect()
 
 
+def ui_image_test(textqueue,audioqueue):
+    import config
+    t1 = threading.Thread(target=UI.setup, args=(textqueue,))
+    t2 = threading.Thread(target=image_test, args=(textqueue,))
+    t3 = threading.Thread(target=speechtts.process_text, args=(textqueue, audioqueue))
+
+    t1.start()
+    t2.start()
+    t3.start()
+    
+    t1.join()
+    t2.join()
+    t3.join()
+
+def ui_comms_process(textqueue, audioqueue):
+    import config
+    t1 = threading.Thread(target=UI.setup, args=(textqueue,))
+    t2 = threading.Thread(target=text_recognition, args=(textqueue,))
+    t3 = threading.Thread(target=speechtts.process_text, args=(textqueue, audioqueue))
+
+    t1.start()
+    t2.start()
+    t3.start()
+    
+    t1.join()
+    t2.join()
+    t3.join()
+
 def main():
     # global config.sampleText
 
@@ -215,8 +243,6 @@ def main():
     print('setup')
 
     path = os.getcwd()
-    # engine, r, m = speechtts.init()
-    # pose.init(path)
 
     print('after setup')
 
@@ -224,14 +250,8 @@ def main():
     commandsqueue = Queue()
     audioqueue = Queue()
 
-    # p1 = Process(target=UI.setup, args=())
-    # read from textqueue
-
-    print('queues')
-
     p2 = Process(target=speechtts.speech, args=(commandsqueue,))
     # send commands to tts
-    print('p2')
 
     p3 = Process(target=pose.init, args=(commandsqueue, path))
     # send commands to tts
@@ -239,38 +259,24 @@ def main():
     p4 = Process(target=speechtts.tts, args=(commandsqueue,audioqueue))
     # read from textqueue
     # get sigs from pose and speech
-    print('p4')
 
-    p5 = Process(target=test_text_recognition, args=(textqueue,))
-    # write to textqueue
-    print('p5')
-
-    p6 = Process(target=speechtts.process_text, args=(textqueue, audioqueue))
-    print('p6')
+    p7 = Process(target=ui_comms_process, args=(textqueue,audioqueue))
 
     print( 'processes start')
 
-    p5.start()
-    print( '5')
-    # p1.start()
+    p7.start()
+
     p2.start()
     print( '2')
     p3.start()
     print('3')
     p4.start()
     print( '4')
-    p6.start()
-    print( '6')
 
-    # p1.join()
+    p7.join()
     p2.join()
     p3.join()
     p4.join()
-    p5.join()
-    p6.join()
-
-    # sys.exit(app.exec_())
-    # sys.exit()
 
 
 if __name__ == '__main__':

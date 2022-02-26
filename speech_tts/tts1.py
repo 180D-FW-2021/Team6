@@ -51,6 +51,7 @@ def process_text(textqueue, audioqueue):
         except Empty as e:
             pass
         else:
+            config.gotImage=0
             outfile.append("temp%s.wav" % str(count))
             engine.setProperty('rate', 120)
             engine.save_to_file(sampleText, outfile[count])
