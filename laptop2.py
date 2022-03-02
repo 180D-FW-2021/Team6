@@ -1,12 +1,13 @@
 import os
 import threading
+from multiprocessing import Process, Pipe, Queue
+from queue import Empty
 
 import paho.mqtt.client as mqtt
 import pyttsx3
 import speech_recognition as sr
 import time
 import sys
-import pygame
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
@@ -16,9 +17,9 @@ import README_UI as UI
 
 import cv2
 import numpy as np
-import mediapipe as mp
-import tensorflow as tf
-from tensorflow.keras.models import load_model
+# import mediapipe as mp
+# import tensorflow as tf
+# from tensorflow.keras.models import load_model
 
 # import functions
 import config
@@ -35,7 +36,7 @@ pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tessera
 client = None
 
 
-def test_text_recognition():
+def test_text_recognition(textqueue):
     sampletextfile = []
     # sampletextfile.append(open('speech_tts/testing/sampletext'))
     # sampletextfile.append(open('speech_tts/testing/sampletext1000'))
@@ -45,24 +46,20 @@ def test_text_recognition():
     sampletextfile.append(open('speech_tts/testing/sampletext_short3'))
     while (1):
         if len(sampletextfile) > 0:
-            process_text_mutex.acquire()
-            config.sampleText.append(sampletextfile[0].read())
+            textqueue.put(sampletextfile[0].read())
             sampletextfile.pop(0)
-            process_text_mutex.release()
-            speechtts.process_text()
+            # speechtts.process_text()
 
 
-# def image_test():
-#     img = cv2.imread("image1.jpg", cv2.IMREAD_COLOR)
-#     process_text_mutex.acquire()
-#     config.ImagePass = "image1.jpg"
-#     # save the processed text in 'text' to send with mqtt
-#     text = pytesseract.image_to_string(img)
-#     config.gotImage = 1
-#     config.sampleText = text
-#     process_text_mutex.release()
-#     speechtts.process_text()
-#     config.gotImage = 0
+def image_test(textqueue):
+    config.start=1
+    print('image test start')
+    img = cv2.imread("image1.jpg", cv2.IMREAD_COLOR)
+    config.ImagePass = "image1.jpg"
+    text = pytesseract.image_to_string(img)
+    config.gotImage = 1
+    config.sampleText.append(text)
+    textqueue.put(text)
 
 # def image_test():
 #     img = cv2.imread("image1.jpg", cv2.IMREAD_COLOR)
@@ -130,6 +127,25 @@ def on_disconnect(client, userdata, rc):
 #     speechtts.process_text()
 
 
+def on_message(client, userdata, message):
+    textqueue = userdata['textqueue']
+    f = open('receive.jpg', 'wb')
+    f.write(message.payload)
+    f.close()
+    print('image received')
+
+    img = cv2.imread("receive.jpg", cv2.IMREAD_COLOR)
+    text = pytesseract.image_to_string(img)
+    # print(text)
+    process_text_mutex.acquire()
+    config.ImagePass = "receive.jpg"
+    #config.sampleText = text
+    config.start = 1
+    config.sampleText.append(text)
+    textqueue.put(text)
+
+    process_text_mutex.release()
+
 # def on_message(client, userdata, message):
 #     f = open('receive.jpg', 'wb')
 #     f.write(message.payload)
@@ -189,9 +205,10 @@ def on_message(client, userdata, message):
     speechtts.process_text()
 
 
-def text_recognition():
+def text_recognition(textqueue):
     # 1. create a client instance.
-    client = mqtt.Client()
+    client_userdata = {'textqueue':textqueue}
+    client = mqtt.Client(userdata=client_userdata)
     # add additional clientoptions (security, certifications, etc.)
     # many default options should be good to start off.
     # add callbacks to client.
@@ -221,37 +238,85 @@ def text_recognition():
     client.disconnect()
 
 
+def ui_image_test(textqueue,audioqueue):
+    import config
+    t1 = threading.Thread(target=UI.setup, args=(textqueue,))
+    t2 = threading.Thread(target=image_test, args=(textqueue,))
+    t3 = threading.Thread(target=speechtts.process_text, args=(textqueue, audioqueue))
+
+    t1.start()
+    t2.start()
+    t3.start()
+    
+    t1.join()
+    t2.join()
+    t3.join()
+
+def posefeed(imagequeue):
+    import config
+    while (1):
+        try:
+            config.frame = imagequeue.get()
+        except Empty as e:
+            pass
+
+def ui_comms_process(textqueue, audioqueue, conn2):
+    import config
+    t1 = threading.Thread(target=UI.setup, args=(textqueue, conn2))
+    t2 = threading.Thread(target=text_recognition, args=(textqueue,))
+    t3 = threading.Thread(target=speechtts.process_text, args=(textqueue, audioqueue))
+
+    t1.start()
+    t2.start()
+    t3.start()
+    
+    t1.join()
+    t2.join()
+    t3.join()
+
 def main():
     # global config.sampleText
 
     # pose.setup()
+    
+    print('setup')
 
     path = os.getcwd()
-    speechtts.init()
-    pose.init(path)
 
-    t1 = threading.Thread(target=UI.setup, args=())
-    t2 = threading.Thread(target=speechtts.speech, args=())
-    t3 = threading.Thread(target=pose.loop, args=(
-        speechtts.read, speechtts.pause))
-    t4 = threading.Thread(target=speechtts.tts, args=())
-    t5 = threading.Thread(target=text_recognition, args=())
+    print('after setup')
 
-    t5.start()
-    t1.start()
-    t2.start()
-    t3.start()
-    t4.start()
+    textqueue = Queue()
+    commandsqueue = Queue()
+    audioqueue = Queue()
+    conn1, conn2 = Pipe()
 
-    t1.join()
-    t2.join()
-    t3.join()
-    t4.join()
-    t5.join()
+    p2 = Process(target=speechtts.speech, args=(commandsqueue,))
+    # send commands to tts
 
-    pose.cleanup()
-    # sys.exit(app.exec_())
-    # sys.exit()
+    p3 = Process(target=pose.init, args=(commandsqueue, path, conn1))
+    # send commands to tts
+
+    p4 = Process(target=speechtts.tts, args=(commandsqueue,audioqueue))
+    # read from textqueue
+    # get sigs from pose and speech
+
+    p7 = Process(target=ui_comms_process, args=(textqueue,audioqueue, conn2))
+
+    print( 'processes start')
+
+    p7.start()
+
+    p2.start()
+    print( '2')
+    p3.start()
+    print('3')
+    p4.start()
+    print( '4')
+
+    p7.join()
+    p2.join()
+    p3.join()
+    p4.join()
 
 
 if __name__ == '__main__':

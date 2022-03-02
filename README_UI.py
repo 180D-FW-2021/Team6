@@ -20,23 +20,18 @@ import os
 class VideoThread(QThread):
     change_pixmap_signal = pyqtSignal(np.ndarray)
 
-    def __init__(self):
+    def __init__(self, conn2):
         super().__init__()
+        self.conn2 = conn2
         self._run_flag = True
 
     def run(self):
         # capture from web cam
         # cap = cv2.VideoCapture(0)
         while self._run_flag:
-            # print('webcam') # for some reason, this makes it less laggy?
-            if config.frame is not None:
-                cv_img = config.frame
-                self.change_pixmap_signal.emit(cv_img)
-        #    ret, cv_img = cap.read()
-        #    if ret:
-        #        self.change_pixmap_signal.emit(cv_img)
-        # shut down capture system
-        # cap.release()
+            cv_img = self.conn2.recv()
+            self.change_pixmap_signal.emit(cv_img)
+        pass
 
     def stop(self):
         """Sets run flag to False and waits for thread to finish"""
@@ -46,7 +41,7 @@ class VideoThread(QThread):
 
 class App(QWidget):
     # Main Screen areas
-    def __init__(self):
+    def __init__(self, conn2):
         super().__init__()
         pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
         self.setWindowTitle("READEME")
@@ -83,7 +78,7 @@ class App(QWidget):
         # self.Webcam.resize(640, 640)
         self.Webcam.setGeometry(QtCore.QRect(1040, 550, 711, 470))
         self.textLabel = QLabel('Webcam')
-        self.thread = VideoThread()
+        self.thread = VideoThread(conn2)
         self.thread.change_pixmap_signal.connect(self.update_image)
         self.thread.start()
         # Webcam -------------------------------------------------------
@@ -247,7 +242,8 @@ class App(QWidget):
 
     def extractText(self):
         config = ('-l eng --oem 1 --psm 3')
-        img = cv2.imread(self.fileName2, cv2.IMREAD_COLOR)
+        # img = cv2.imread(self.fileName2, cv2.IMREAD_COLOR)
+        img = cv2.imread(self.fileName, cv2.IMREAD_COLOR)
         # Run tesseract OCR on image
         text = pytesseract.image_to_string(img, config=config)
         # Print recognized text
@@ -311,9 +307,9 @@ class App(QWidget):
         return (str1.join(s))
 
 
-def setup():
+def setup(textqueue, conn2):
     app = QApplication(sys.argv)
-    a = App()
+    a = App(conn2)
     c = a.palette()
     c.setColor(a.backgroundRole(), Qt.gray)
     a.setPalette(c)

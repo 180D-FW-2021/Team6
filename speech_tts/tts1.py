@@ -5,9 +5,8 @@ import sys
 import pygame
 import config
 
-# import pycaw
-#import alsaaudio
-#import applescript
+from multiprocessing import Queue
+from queue import Empty
 
 # TODO:
 #       add reading of ocr text result
@@ -31,15 +30,7 @@ outfile = None
 sampleText = "hi hi"
 '''
 
-engine = None
-r = None
-m = None
-screen = None
-count = 0
-play_count = 0
 MUSIC_END = pygame.USEREVENT+1
-started = False
-paused = False
 
 def init():
     global engine, r, m, screen 
@@ -55,34 +46,42 @@ def init():
         print("volume controls not supported")
     '''
     pygame.mixer.init()
-    # screen = pygame.display.set_mode((1, 1))
     engine = pyttsx3.init()
     r = sr.Recognizer()
     m = sr.Microphone(device_index=0)
-    calibrate()
+    calibrate(r,m)
+    return engine, r, m
 
-def process_text():
-    # global config.sampleText
-    while config.sampleText == None:
-        pass
-    global engine, count
-    config.outfile.append("temp%s.wav" % str(count))
-    engine.setProperty('rate', 120)
-    engine.save_to_file(config.sampleText[count], config.outfile[count])
-    engine.runAndWait()
-    count += 1
+def process_text(textqueue, audioqueue):
+    engine = pyttsx3.init()
+    count = 0
+    outfile = []
+    while 1:
+        try:
+            sampleText = textqueue.get()
+            print("hi from process_text", sampleText)
+        except Empty as e:
+            pass
+        else:
+            config.gotImage=0
+            outfile.append("temp%s.wav" % str(count))
+            engine.setProperty('rate', 120)
+            engine.save_to_file(sampleText, outfile[count])
+            engine.runAndWait()
+            audioqueue.put(outfile[count])
+            count += 1
+            print(count)
 
-def read():
-    global engine, r, m, play_count, count, started, paused # , config.outfile, config.sampleText
-    print('read function')
-    if len(config.outfile) > 0 and play_count < count:
+def read(audioqueue, started, paused, play_count):
+    '''
+    if len(config.outfile) > 0 and config.play_count < config.count:
         if not pygame.mixer.music.get_busy(): # don't restart if file is already playing
             try:
-                print(play_count, count)
-                pygame.mixer.music.load(config.outfile[play_count])
+                print(config.play_count, config.count)
+                pygame.mixer.music.load(config.outfile[config.play_count])
                 pygame.mixer.music.play()
-                started = True
-                paused = False
+                config.started = True
+                config.paused = False
                 # pygame.mixer.music.set_endevent(MUSIC_END)
             except pygame.error as e:
                 if e.args[0] is not None:
@@ -92,24 +91,35 @@ def read():
                         print(e.message)
                 else:
                     print(str(e))
+    '''
+    if not pygame.mixer.music.get_busy():
+        try:
+            aud = audioqueue.get()
+            play_count += 1
+        except Empty as e:
+            print('no audio files yet')
+        else:
+            pygame.mixer.music.load(aud)
+            pygame.mixer.music.play()
+            started = True
+            paused = False
+    return started, paused, play_count
 
-def stop():
-    global started, paused
+
+def stop(started, paused):
     print('stop function')
-    started = False
-    paused = True
+    config.started = False
+    config.paused = True
     pygame.mixer.music.stop()
 
 
-def pause():
-    global started, paused
+def pause(started, paused):
     print('pause function')
-    paused = True
+    config.paused = True
     pygame.mixer.music.pause()
 
-def unpause():
-    global started, paused
-    paused = False
+def unpause(started, paused):
+    config.paused = False
     pygame.mixer.music.unpause()
 
 def volumeUp():
@@ -120,13 +130,12 @@ def volumeDown():
     cur_vol = pygame.mixer.get_volume()
     pygame.mixer.set_volume(cur_vol - 0.1)
 
-def calibrate():
-    global r, m
+def calibrate(r, m):
     with m as source: 
         r.adjust_for_ambient_noise(source)
 
-def speech():
-    global engine, r, m, MUSIC_END, play_count, started, paused
+def speech(commandsqueue):
+    r = sr.Recognizer()
     while (1):
         with sr.Microphone() as source:
             print("say something!")
@@ -137,27 +146,28 @@ def speech():
             print("You said: " + speech)
 
             speech = speech.split()[0]
-            print("Command given: " + speech)
+            # print("Command given: " + speech)
 
             if speech == "start":
                 phrase = "starting text reading"
-                read()
+                # read()
+                commandsqueue.put('start')
                 # pygame.mixer.music.set_endevent(MUSIC_END)
             elif speech == "stop":
                 phrase = "stopping text reading"
-                pause()
+                # pause()
+                commandsqueue.put('stop')
             elif speech == "pause":
                 phrase = "pausing text reading"
-                pause()
+                # pause()
+                commandsqueue.put('pause')
             elif speech == "play":
                 phrase = "resuming text reading"
-                unpause()
+                commandsqueue.put('unpause')
             elif speech == "louder":
                 phrase = "volume up"
-                volumeUp()
             elif speech == "softer":
                 phrase = "volume down"
-                volumeDown()
             # TODO speeding up/down currently not implemented, 
             #      complications with the time required to resample the wav file
                 '''
@@ -177,11 +187,14 @@ def speech():
                 print("Error; {0}".format(e))
 
 
-def tts():
-    global engine, r, m, MUSIC_END, play_count, started, paused
+def tts(commandsqueue, audioqueue):
+    started = False
+    paused = False
+    play_count = 0
+    init()
     while (1):
+        ''' 
         try:
-            '''
             for event in pygame.event.get():
                 if event.type == MUSIC_END:
                     print('music end event')
@@ -189,29 +202,47 @@ def tts():
                     #    print('music end event')
                     play_count += 1
                     pygame.mixer.music.set_endevent()
-            '''
-            '''
             if pygame.mixer.music.get_endevent():
                 print('music end event')
                 play_count += 1
                 # pygame.mixer.music.set_endevent()
-            '''
             pass
         except pygame.error as e:
             print(e.args[0])
+        '''
+        try:
+            cmd = commandsqueue.get()
+            print(cmd)
+            if cmd == 'start':
+                print( 'got start' )
+                read(audioqueue, started, paused, play_count)
+            elif cmd == 'stop':
+                stop(started, paused)
+            elif cmd == 'pause':
+                pause(started, paused)
+            elif cmd == 'unpause':
+                unpause(started, paused)
+           
+        except Empty as e:
+            pass
+
         if started and not paused and not pygame.mixer.music.get_busy():
             started = False
             print( 'music end' )
-            play_count +=1
+            # play_count +=1
 
+
+def tts_wrapper(commandsqueue, textqueue):
+    while(1):
+        pass
 
 def main():
-    global sample_text, engine, r, m, already_processed
-    init()
+    global sample_text
+    engine, r, m = init()
     sampletextfile = open(sys.argv[1], "r")
     sampleText = sampletextfile.read()
-    process_text()
-    speech_and_text() 
+    process_text(engine)
+    # run speech and tts
 
 if __name__=='__main__':
     main()

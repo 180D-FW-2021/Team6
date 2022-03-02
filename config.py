@@ -9,3 +9,10 @@ cap = None
 frame = None
 
 start = 0
+
+
+# tts
+started = False
+paused = False
+count = 0
+play_count = 0

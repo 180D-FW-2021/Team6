@@ -7,9 +7,7 @@ import numpy as np
 import mediapipe as mp
 import tensorflow as tf
 from tensorflow.keras.models import load_model
-
-import config
-
+'''
 mpHands = None
 hands = None
 mpDraw = None
@@ -18,10 +16,10 @@ classNames = None
 cap = None
 counter = 0
 pose = None
+'''
 
 # path arg is path of Team6 folder
-def init(path):
-    global mpHands, hands, mpDraw, model, classNames, cap, counter, pose
+def init(commandsqueue, path, conn1):
     # initialize mediapipe
     mpHands = mp.solutions.hands
     hands = mpHands.Hands(max_num_hands=1, min_detection_confidence=0.7)
@@ -42,8 +40,6 @@ def init(path):
     counter = 0 
     pose = "" 
 
-def loop(read_func=None, pause_func=None):
-    global mpHands, hands, mpDraw, model, classNames, cap, counter, pose
     while True:
         # Read each frame from the webcam
         _, frame = cap.read()
@@ -87,29 +83,27 @@ def loop(read_func=None, pause_func=None):
                     cv2.LINE_AA)
         
         # Show the final output
-        cv2.imshow("Output", frame)
+        # Uncomment to show pose recognition window
+        # cv2.imshow("Output", frame)
+        conn1.send(frame)
         
         if counter > 5: 
             if className == 'stop': 
                 print("pose: stop")
-                if pause_func is not None:
-                    pause_func()
+                commandsqueue.put('stop')
 
             elif className == 'thumbs up':
                 print("pose: start")
-                if read_func is not None:
-                    read_func()
+                commandsqueue.put('start')
             counter = 0
         if pose == className: 
             counter = counter + 1 
         
-        pose = className       
+        pose = className 
 
         if cv2.waitKey(1) == ord('q'):
             break
 
-def cleanup():
-    global cap
     # release the webcam and destroy all active windows
     cap.release()
     
