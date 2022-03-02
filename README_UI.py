@@ -41,11 +41,12 @@ class VideoThread(QThread):
 
 class App(QWidget):
     # Main Screen areas
-    def __init__(self, conn2):
+    def __init__(self, conn2, textqueue):
         super().__init__()
         pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
         self.setWindowTitle("READEME")
         self.resize(1920, 1080)
+        self.textqueue = textqueue
 
         timer = QTimer(self)
         timer.timeout.connect(self.updateScreen)
@@ -248,6 +249,7 @@ class App(QWidget):
         text = pytesseract.image_to_string(img, config=config)
         # Print recognized text
         self.textEdit.append(text)
+        self.textqueue.put(text)
         print(text)
 
     def clearText(self):
@@ -309,7 +311,7 @@ class App(QWidget):
 
 def setup(textqueue, conn2):
     app = QApplication(sys.argv)
-    a = App(conn2)
+    a = App(conn2, textqueue)
     c = a.palette()
     c.setColor(a.backgroundRole(), Qt.gray)
     a.setPalette(c)
