@@ -164,45 +164,45 @@ def on_message(client, userdata, message):
 #     process_text_mutex.release()
 #     speechtts.process_text()
 
-def on_message(client, userdata, message):
-    f = open('receive.jpg', 'wb')
-    f.write(message.payload)
-    f.close()
-    #print('image received')
-    config.sampleText.append('Image Received')
-    config.start = 1
-    img = cv2.imread("receive.jpg", cv2.IMREAD_COLOR)
-
-    process_text_mutex.acquire()
-    # Old preprocessing Midterm version
-    '''gray_image = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    kernel = np.ones((1, 1), np.uint8)
-    nn = cv2.dilate(gray_image, kernel, iterations=1)
-    kernel = np.ones((1, 1), np.uint8)
-    nn = cv2.erode(gray_image, kernel, iterations=1)
-    nn = cv2.morphologyEx(gray_image, cv2.MORPH_CLOSE, kernel)
-    nn = cv2.medianBlur(gray_image, 3)
-    cv2.imwrite("receive.jpg_processed.jpg", nn)
-    text = pytesseract.image_to_string(nn)'''
-    
-    # Post midterm Feb 11, more accuracy
-    gray_image = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    thresh, bw = cv2.threshold(gray_image, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
-    bt = cv2.bitwise_not(bw)
-    kernel = np.ones((1,1),np.uint8) #increase 2,2 to 3,3 for stronger dilation, 5,5 is too
-    bt = cv2.dilate(bt, kernel, iterations=1)
-    bt = cv2.bitwise_not(bt)
-    cv2.imwrite("receive.jpg_processed.jpg", bt)
-    text = pytesseract.image_to_string(bt)
-
-    process_text_mutex.acquire()
-    config.ImagePass = "receive.jpg"
-    #config.sampleText = text
-    config.start = 1
-    config.sampleText.append(text)
-
-    process_text_mutex.release()
-    speechtts.process_text()
+# def on_message(client, userdata, message):
+#     f = open('receive.jpg', 'wb')
+#     f.write(message.payload)
+#     f.close()
+#     #print('image received')
+#     config.sampleText.append('Image Received')
+#     config.start = 1
+#     img = cv2.imread("receive.jpg", cv2.IMREAD_COLOR)
+# 
+#     process_text_mutex.acquire()
+#     # Old preprocessing Midterm version
+#     '''gray_image = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+#     kernel = np.ones((1, 1), np.uint8)
+#     nn = cv2.dilate(gray_image, kernel, iterations=1)
+#     kernel = np.ones((1, 1), np.uint8)
+#     nn = cv2.erode(gray_image, kernel, iterations=1)
+#     nn = cv2.morphologyEx(gray_image, cv2.MORPH_CLOSE, kernel)
+#     nn = cv2.medianBlur(gray_image, 3)
+#     cv2.imwrite("receive.jpg_processed.jpg", nn)
+#     text = pytesseract.image_to_string(nn)'''
+#     
+#     # Post midterm Feb 11, more accuracy
+#     gray_image = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+#     thresh, bw = cv2.threshold(gray_image, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+#     bt = cv2.bitwise_not(bw)
+#     kernel = np.ones((1,1),np.uint8) #increase 2,2 to 3,3 for stronger dilation, 5,5 is too
+#     bt = cv2.dilate(bt, kernel, iterations=1)
+#     bt = cv2.bitwise_not(bt)
+#     cv2.imwrite("receive.jpg_processed.jpg", bt)
+#     text = pytesseract.image_to_string(bt)
+# 
+#     process_text_mutex.acquire()
+#     config.ImagePass = "receive.jpg"
+#     #config.sampleText = text
+#     config.start = 1
+#     config.sampleText.append(text)
+# 
+#     process_text_mutex.release()
+#     speechtts.process_text()
 
 
 def text_recognition(textqueue):
