@@ -42,7 +42,8 @@ started = False
 paused = False
 
 def init():
-    global engine, r, m, screen  
+    global engine, r, m, screen 
+    ''' 
     if sys.platform == "win32":
         pass
         # import pycaw
@@ -52,6 +53,7 @@ def init():
         import alsaaudio
     else:
         print("volume controls not supported")
+    '''
     pygame.mixer.init()
     # screen = pygame.display.set_mode((1, 1))
     engine = pyttsx3.init()

@@ -13,6 +13,9 @@ from PyQt5.QtCore import *
 from UI.Instructions_Pop_up import Ui_MainWindow
 #from UI.Instructions_Pop_up import *
 
+from PIL import Image 
+import PIL
+import os 
 
 class VideoThread(QThread):
     change_pixmap_signal = pyqtSignal(np.ndarray)
@@ -51,26 +54,28 @@ class App(QWidget):
 
         timer = QTimer(self)
         timer.timeout.connect(self.updateScreen)
-        timer.start(10000)
+        timer.start(10)
 
         # Image area ---------------------------------------------------
         self.labelImage = QLabel(self)
-        self.labelImage.setGeometry(QtCore.QRect(30, 50, 711, 470))
+        self.labelImage.setGeometry(QtCore.QRect(1000, 100, 711, 470))
         self.labelImage.setFrameShape(QtWidgets.QFrame.WinPanel)
         self.labelImage.setText("")
         self.labelImage.setObjectName("labelImage")
         self.labelImage.setScaledContents(True)
+        self.labelImage.setStyleSheet("background:rgb(218,217,212);")
         # Image area ---------------------------------------------------
 
         # Text area ------------------------------------------------------
         self.textEdit = QTextEdit(self)
-        self.textEdit.setGeometry(QtCore.QRect(1000, 50, 711, 470))
+        self.textEdit.setGeometry(QtCore.QRect(30, 100, 711, 600))
         font = QtGui.QFont()
         font.setPointSize(20)
         self.textEdit.setFont(font)
         self.textEdit.setFrameShape(QtWidgets.QFrame.WinPanel)
         self.textEdit.setFrameShadow(QtWidgets.QFrame.Plain)
         self.textEdit.setObjectName("textEdit")
+        self.textEdit.setStyleSheet("background:rgb(218,217,212);")
         # Text area ------------------------------------------------------
 
         # Webcam -------------------------------------------------------
@@ -84,41 +89,63 @@ class App(QWidget):
         # Webcam -------------------------------------------------------
 
         # Buttons ------------------------------------------------------------
+        ButtonInfo = """
+        QPushButton {
+            background:rgb(218,217,212); 
+            border: 2px solid black;
+            border-radius: 15px;
+        }
+        QPushButton:hover {
+             background-color:rgb(49, 229, 196);
+        }
+        """
         self.Loadimage = QPushButton("Load Image", self)
         self.Loadimage.setObjectName("Load Image")
-        self.Loadimage.setGeometry(QtCore.QRect(225, 610, 250, 41))
+        self.Loadimage.setGeometry(QtCore.QRect(100, 740, 250, 41))
         self.Loadimage.resize(250, 75)
         self.Loadimage.setFont(QFont('Times', 15))
         self.Loadimage.clicked.connect(self.getImage)
+        self.Loadimage.setStyleSheet(ButtonInfo)
 
         self.Run = QPushButton("Run", self)
         self.Run.setObjectName("Run")
-        self.Run.setGeometry(QtCore.QRect(225, 685, 250, 41))
+        self.Run.setGeometry(QtCore.QRect(100, 820, 250, 41))
         self.Run.resize(250, 75)
         self.Run.setFont(QFont('Times', 15))
         self.Run.clicked.connect(self.extractText)
+        self.Run.setStyleSheet(ButtonInfo)
 
         self.Clear = QPushButton("Clear", self)
         self.Clear.setObjectName("Clear")
-        self.Clear.setGeometry(QtCore.QRect(225, 760, 250, 41))
+        self.Clear.setGeometry(QtCore.QRect(100, 900, 250, 41))
         self.Clear.resize(250, 75)
         self.Clear.setFont(QFont('Times', 15))
         self.Clear.clicked.connect(self.clearText)
+        self.Clear.setStyleSheet(ButtonInfo)
 
         self.Save = QPushButton("Save text", self)
         self.Save.setObjectName("Save text")
-        self.Save.setGeometry(QtCore.QRect(225, 835, 250, 41))
+        self.Save.setGeometry(QtCore.QRect(375, 740, 250, 41))
         self.Save.resize(250, 75)
         self.Save.setFont(QFont('Times', 15))
         self.Save.clicked.connect(self.saveText)
+        self.Save.setStyleSheet(ButtonInfo)
+
+        self.SaveImage = QPushButton("Save Image", self)
+        self.SaveImage.setObjectName("Save Image")
+        self.SaveImage.setGeometry(QtCore.QRect(375, 820, 250, 41))
+        self.SaveImage.resize(250, 75)
+        self.SaveImage.setFont(QFont('Times', 15))
+        self.SaveImage.clicked.connect(self.saveImage)
+        self.SaveImage.setStyleSheet(ButtonInfo)
 
         self.Instructions = QPushButton("Instructions", self)
         self.Instructions.setObjectName("Instructions")
-        self.Instructions.setGeometry(QtCore.QRect(225, 910, 250, 41))
+        self.Instructions.setGeometry(QtCore.QRect(375, 900, 250, 41))
         self.Instructions.resize(250, 75)
         self.Instructions.setFont(QFont('Times', 15))
         self.Instructions.clicked.connect(self.openWindow)
-
+        self.Instructions.setStyleSheet(ButtonInfo)
         # self.Exit = QPushButton("Exit", self)
         # self.Exit.setObjectName("Exit")
         # self.Exit.setGeometry(QtCore.QRect(30, 860, 171, 41))
@@ -127,6 +154,7 @@ class App(QWidget):
         # self.Exit.clicked.connect(self.close)
 
         # Buttons ------------------------------------------------------------
+    
 
     def closeEvent(self, event):
         self.thread.stop()
@@ -162,20 +190,53 @@ class App(QWidget):
         if self.fileName:
             print(self.fileName)
             self.img = cv2.imread(self.fileName)
+            #1 GRAY
             self.gray_image = cv2.cvtColor(self.img, cv2.COLOR_BGR2GRAY)
             cv2.imwrite("gray.jpg", self.gray_image)
-            #thresh, self.im_bw = cv2.threshold(self.gray_image, 210, 230, cv2.THRESH_BINARY)
-            #cv2.imwrite("bw_image.jpg", self.im_bw)
+            #2 BW
+            #thresh, self.bw = cv2.threshold(self.gray_image, 210, 230, cv2.THRESH_BINARY)
+            thresh, self.bw = cv2.threshold(self.gray_image, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+            cv2.imwrite("bw_image.jpg", self.bw)
+
+            ##########
+            #3 GRAY-> BLACK and WHITE -> DILATION
+            self.bt = cv2.bitwise_not(self.bw)
+            kernel = np.ones((1,1),np.uint8) #increase 2,2 to 3,3 for stronger dilation, 5,5 is too
+            self.bt = cv2.dilate(self.bt, kernel, iterations=1)
+            self.bt = cv2.bitwise_not(self.bt)
+
+            #4 GRAY-> BLACK and WHITE -> DILATION -> NOISE REMOVAL
+            '''
             kernel = np.ones((1, 1), np.uint8)
-            self.nn = cv2.dilate(self.gray_image, kernel, iterations=1)
-            kernel = np.ones((1, 1), np.uint8)
-            self.nn = cv2.erode(self.gray_image, kernel, iterations=1)
-            self.nn = cv2.morphologyEx(
-                self.gray_image, cv2.MORPH_CLOSE, kernel)
-            self.nn = cv2.medianBlur(self.gray_image, 3)
-            cv2.imwrite("no_noise.jpg", self.nn)
+            self.nn = cv2.dilate(self.bt, kernel, iterations=1)
+            self.nn = cv2.erode(self.nn, kernel, iterations=1)
+            self.nn = cv2.morphologyEx(self.nn, cv2.MORPH_CLOSE, kernel)
+            self.nn = cv2.medianBlur(self.nn, 3)'''
+
+            #5 Noise removal and erosion
+            # GRAY > BLACK WHITE#2 > NOISE REMOVAL
+            '''kernel = np.ones((1, 1), np.uint8)
+            self.nn = cv2.dilate(self.bw, kernel, iterations=1)
+            self.nn = cv2.erode(self.nn, kernel, iterations=1)
+            self.nn = cv2.morphologyEx(self.nn, cv2.MORPH_CLOSE, kernel)
+            self.nn = cv2.medianBlur(self.nn, 3)'''
+            # Dilation
+
+            # GRAY > BLACK WHITE > NOISE REMOVAL > DILATION
+            '''self.bt = cv2.bitwise_not(self.nn)
+            kernel = np.ones((2,2),np.uint8) #increase 2,2 to 3,3 for stronger dilation, 5,5 is too
+            self.bt = cv2.dilate(self.bt, kernel, iterations=1)
+            self.bt = cv2.bitwise_not(self.bt)'''
+            # GRAY > BLACK WHITE > DILATION
+            '''self.bt = cv2.bitwise_not(self.bw)
+            kernel = np.ones((2,2),np.uint8) #increase 2,2 to 3,3 for stronger dilation, 5,5 is too
+            self.bt = cv2.dilate(self.bt, kernel, iterations=1)
+            self.bt = cv2.bitwise_not(self.bt)'''
+            #cv2.imwrite("no_noise.jpg", self.nn)
+            cv2.imwrite("dilated.jpg", self.bt)
             pattern = ".(jpg|png|jpeg|bmp|jpe|tiff)$"
-            self.fileName2 = "no_noise.jpg"
+            self.fileName2 = "dilated.jpg"
+            #self.fileName2 = "no_noise.jpg"
             if re.search(pattern, self.fileName2):
                 # self.setImage(self.fileName)
                 self.setImage(self.fileName)
@@ -207,6 +268,21 @@ class App(QWidget):
             text = self.textEdit.toPlainText()
             file.write(text)
             file.close()
+
+    def saveImage(self):
+        fileName, _ = QFileDialog.getSaveFileName(self)
+        if fileName:
+            split_tup = os.path.splitext(fileName)
+            pixmap = self.labelImage.pixmap()
+            if pixmap is not None and fileName:
+                if not split_tup[1]:
+                    jpg ='.jpg'
+                    pixmap.save(fileName+jpg)    
+                else:
+                    pixmap.save(fileName)
+        
+            
+
 
     def openWindow(self):
         self.window = QtWidgets.QMainWindow()
@@ -250,7 +326,8 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
     a = App()
     c = a.palette()
-    c.setColor(a.backgroundRole(), Qt.gray)
+    #c.setColor(a.backgroundRole(), QColor(26, 62, 88))
+    c.setBrush(QPalette.Background,QBrush(QPixmap("BackgroundImage.png")))
     a.setPalette(c)
     a.show()
     #a.setText("THis is a test")
