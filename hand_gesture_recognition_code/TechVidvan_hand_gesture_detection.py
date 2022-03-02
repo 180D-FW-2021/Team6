@@ -19,7 +19,7 @@ pose = None
 '''
 
 # path arg is path of Team6 folder
-def init(commandsqueue, path):
+def init(commandsqueue, path, conn1):
     # initialize mediapipe
     mpHands = mp.solutions.hands
     hands = mpHands.Hands(max_num_hands=1, min_detection_confidence=0.7)
@@ -83,7 +83,9 @@ def init(commandsqueue, path):
                     cv2.LINE_AA)
         
         # Show the final output
-        cv2.imshow("Output", frame)
+        # Uncomment to show pose recognition window
+        # cv2.imshow("Output", frame)
+        conn1.send(frame)
         
         if counter > 5: 
             if className == 'stop': 

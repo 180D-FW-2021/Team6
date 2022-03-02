@@ -1,6 +1,7 @@
 import os
 import threading
 from multiprocessing import Process, Pipe, Queue
+from queue import Empty
 
 import paho.mqtt.client as mqtt
 import pyttsx3
@@ -221,9 +222,17 @@ def ui_image_test(textqueue,audioqueue):
     t2.join()
     t3.join()
 
-def ui_comms_process(textqueue, audioqueue):
+def posefeed(imagequeue):
     import config
-    t1 = threading.Thread(target=UI.setup, args=(textqueue,))
+    while (1):
+        try:
+            config.frame = imagequeue.get()
+        except Empty as e:
+            pass
+
+def ui_comms_process(textqueue, audioqueue, conn2):
+    import config
+    t1 = threading.Thread(target=UI.setup, args=(textqueue, conn2))
     t2 = threading.Thread(target=text_recognition, args=(textqueue,))
     t3 = threading.Thread(target=speechtts.process_text, args=(textqueue, audioqueue))
 
@@ -249,18 +258,19 @@ def main():
     textqueue = Queue()
     commandsqueue = Queue()
     audioqueue = Queue()
+    conn1, conn2 = Pipe()
 
     p2 = Process(target=speechtts.speech, args=(commandsqueue,))
     # send commands to tts
 
-    p3 = Process(target=pose.init, args=(commandsqueue, path))
+    p3 = Process(target=pose.init, args=(commandsqueue, path, conn1))
     # send commands to tts
 
     p4 = Process(target=speechtts.tts, args=(commandsqueue,audioqueue))
     # read from textqueue
     # get sigs from pose and speech
 
-    p7 = Process(target=ui_comms_process, args=(textqueue,audioqueue))
+    p7 = Process(target=ui_comms_process, args=(textqueue,audioqueue, conn2))
 
     print( 'processes start')
 
