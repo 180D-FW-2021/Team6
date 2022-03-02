@@ -33,6 +33,18 @@ sampleText = "hi hi"
 MUSIC_END = pygame.USEREVENT+1
 
 def init():
+    global engine, r, m, screen 
+    ''' 
+    if sys.platform == "win32":
+        pass
+        # import pycaw
+    elif sys.platform == "darwin":
+        import applescript
+    elif sys.platform == "linux":
+        import alsaaudio
+    else:
+        print("volume controls not supported")
+    '''
     pygame.mixer.init()
     engine = pyttsx3.init()
     r = sr.Recognizer()
