@@ -77,7 +77,7 @@ class App(QWidget):
         # Webcam -------------------------------------------------------
         self.Webcam = QLabel(self)
         # self.Webcam.resize(640, 640)
-        self.Webcam.setGeometry(QtCore.QRect(1040, 550, 711, 470))
+        self.Webcam.setGeometry(QtCore.QRect(1040, 575, 711, 470))
         self.textLabel = QLabel('Webcam')
         self.thread = VideoThread(conn2)
         self.thread.change_pixmap_signal.connect(self.update_image)
@@ -313,7 +313,8 @@ def setup(textqueue, conn2):
     app = QApplication(sys.argv)
     a = App(conn2, textqueue)
     c = a.palette()
-    c.setColor(a.backgroundRole(), Qt.gray)
+    #c.setColor(a.backgroundRole(), Qt.gray)
+    c.setBrush(QPalette.Background,QBrush(QPixmap("BackgroundImage.png")))
     a.setPalette(c)
     a.show()
     sys.exit(app.exec_())
