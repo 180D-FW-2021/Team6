@@ -135,7 +135,25 @@ def on_message(client, userdata, message):
     print('image received')
 
     img = cv2.imread("receive.jpg", cv2.IMREAD_COLOR)
-    text = pytesseract.image_to_string(img)
+    
+    # New code: preprocessing if receive.jpg is the unpreprocessed image
+    gray_image = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    cv2.imwrite("gray.jpg", gray_image)
+    #2 BW
+    #thresh, self.bw = cv2.threshold(self.gray_image, 210, 230, cv2.THRESH_BINARY)
+    thresh, bw = cv2.threshold(gray_image, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+    cv2.imwrite("bw_image.jpg", bw)
+
+    ##########
+    #3 GRAY-> BLACK and WHITE -> DILATION
+    bt = cv2.bitwise_not(bw)
+    kernel = np.ones((1,1),np.uint8) #increase 2,2 to 3,3 for stronger dilation, 5,5 is too
+    bt = cv2.dilate(bt, kernel, iterations=1)
+    bt = cv2.bitwise_not(bt)
+
+    text = pytesseract.image_to_string(bt)
+    
+    #text = pytesseract.image_to_string(img)
     # print(text)
     process_text_mutex.acquire()
     config.ImagePass = "receive.jpg"
