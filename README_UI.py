@@ -144,7 +144,7 @@ class App(QWidget):
         self.Instructions.setStyleSheet(ButtonInfo)
 
         self.Speech = QPushButton("Speech Recognition", self)
-        self.Speech.setObjectName("SpSpeech Recognitioneech")
+        self.Speech.setObjectName("Speech Recognition")
         self.Speech.setGeometry(QtCore.QRect(650, 740, 250, 41))
         self.Speech.resize(250, 75)
         self.Speech.setFont(QFont('Times', 15))
