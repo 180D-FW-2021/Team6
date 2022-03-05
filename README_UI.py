@@ -142,12 +142,14 @@ class App(QWidget):
         self.Instructions.setFont(QFont('Times', 15))
         self.Instructions.clicked.connect(self.openWindow)
         self.Instructions.setStyleSheet(ButtonInfo)
-        # self.Exit = QPushButton("Exit", self)
-        # self.Exit.setObjectName("Exit")
-        # self.Exit.setGeometry(QtCore.QRect(30, 860, 171, 41))
-        # self.Exit.resize(200, 50)
-        # self.Exit.setFont(QFont('Times', 15))
-        # self.Exit.clicked.connect(self.close)
+
+        self.Speech = QPushButton("Speech Recognition", self)
+        self.Speech.setObjectName("SpSpeech Recognitioneech")
+        self.Speech.setGeometry(QtCore.QRect(650, 740, 250, 41))
+        self.Speech.resize(250, 75)
+        self.Speech.setFont(QFont('Times', 15))
+        #self.Speech.clicked.connect(self.saveText)
+        self.Speech.setStyleSheet(ButtonInfo)
 
         # Buttons ------------------------------------------------------------
     
