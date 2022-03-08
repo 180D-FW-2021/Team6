@@ -134,60 +134,62 @@ def calibrate(r, m):
     with m as source: 
         r.adjust_for_ambient_noise(source)
 
-def speech(commandsqueue):
+def speech(commandsqueue, speechbutton2):
     r = sr.Recognizer()
     while (1):
-        with sr.Microphone() as source:
-            print("say something!")
-            time.sleep(1)
-            audio = r.listen(source)
-        try:
-            speech = r.recognize_google(audio)
-            print("You said: " + speech)
+        val = speechbutton2.recv()
+        if val == 1:
+            with sr.Microphone() as source:
+                print("say something!")
+                time.sleep(1)
+                audio = r.listen(source)
+            try:
+                speech = r.recognize_google(audio)
+                print("You said: " + speech)
 
-            speech = speech.split()[0]
-            # print("Command given: " + speech)
+                speech = speech.split()[0]
+                # print("Command given: " + speech)
 
-            if speech == "start":
-                phrase = "starting text reading"
-                # read()
-                commandsqueue.put('start')
-                # pygame.mixer.music.set_endevent(MUSIC_END)
-            elif speech == "stop":
-                phrase = "stopping text reading"
-                # pause()
-                commandsqueue.put('stop')
-            elif speech == "pause":
-                phrase = "pausing text reading"
-                # pause()
-                commandsqueue.put('pause')
-            elif speech == "play":
-                phrase = "resuming text reading"
-                commandsqueue.put('unpause')
-            elif speech == "louder":
-                phrase = "volume up"
-            elif speech == "softer":
-                phrase = "volume down"
-            # TODO speeding up/down currently not implemented, 
-            #      complications with the time required to resample the wav file
-                '''
-                elif speech == "speed up":
-                        phrase = "speeding up"
-                        engine.say(phrase)
-                        print(phrase)
-                elif speech == ("slow down"):
-                        phrase = "slowing down"
-                        engine.say(phrase)
-                        print(phrase)
-                '''
+                if speech == "start":
+                    phrase = "starting text reading"
+                    # read()
+                    commandsqueue.put('start')
+                    # pygame.mixer.music.set_endevent(MUSIC_END)
+                elif speech == "stop":
+                    phrase = "stopping text reading"
+                    # pause()
+                    commandsqueue.put('stop')
+                elif speech == "pause":
+                    phrase = "pausing text reading"
+                    # pause()
+                    commandsqueue.put('pause')
+                elif speech == "play":
+                    phrase = "resuming text reading"
+                    commandsqueue.put('unpause')
+                elif speech == "louder":
+                    phrase = "volume up"
+                elif speech == "softer":
+                    phrase = "volume down"
+                # TODO speeding up/down currently not implemented, 
+                #      complications with the time required to resample the wav file
+                    '''
+                    elif speech == "speed up":
+                            phrase = "speeding up"
+                            engine.say(phrase)
+                            print(phrase)
+                    elif speech == ("slow down"):
+                            phrase = "slowing down"
+                            engine.say(phrase)
+                            print(phrase)
+                    '''
 
-        except sr.UnknownValueError:
-                print("Google Speech Recognition could not understand audio")
-        except sr.RequestError as e:
-                print("Error; {0}".format(e))
+            except sr.UnknownValueError:
+                    print("Google Speech Recognition could not understand audio")
+            except sr.RequestError as e:
+                    print("Error; {0}".format(e))
 
 
-def tts(commandsqueue, audioqueue):
+def tts(commandsqueue, audioqueue, tts_ui_conn):
     started = False
     paused = False
     play_count = 0

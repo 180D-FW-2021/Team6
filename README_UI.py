@@ -41,7 +41,7 @@ class VideoThread(QThread):
 
 class App(QWidget):
     # Main Screen areas
-    def __init__(self, conn2, textqueue):
+    def __init__(self, conn2, textqueue, speechbutton1, ui_tts_conn):
         super().__init__()
         pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
         self.setWindowTitle("READEME")
@@ -88,7 +88,18 @@ class App(QWidget):
         ButtonInfo = """
         QPushButton {
             background:rgb(218,217,212); 
-            border: 2px solid black;
+            border: 2px solid white;
+            border-radius: 15px;
+        }
+        QPushButton:hover {
+             background-color:rgb(49, 229, 196);
+        }
+        """
+
+        ButtonInfo_toggled = """
+        QPushButton {
+            background: rgb(141,187,227); 
+            border: 3px solid white;
             border-radius: 15px;
         }
         QPushButton:hover {
@@ -146,9 +157,12 @@ class App(QWidget):
         self.Speech = QPushButton("Speech Recognition", self)
         self.Speech.setObjectName("Speech Recognition")
         self.Speech.setGeometry(QtCore.QRect(650, 740, 250, 41))
+        # self.Speech.setAutoRepeat(True)
         self.Speech.resize(250, 75)
         self.Speech.setFont(QFont('Times', 15))
-        #self.Speech.clicked.connect(self.saveText)
+        self.Speech.setCheckable(True)
+        self.Speech.clicked.connect(lambda: self.handleSpeech(ButtonInfo, ButtonInfo_toggled, \
+                                            speechbutton1, ui_tts_conn))
         self.Speech.setStyleSheet(ButtonInfo)
 
         # Buttons ------------------------------------------------------------
@@ -281,7 +295,17 @@ class App(QWidget):
                 else:
                     pixmap.save(fileName)
         
-            
+    def handleSpeech(self, ButtonInfo, ButtonInfo1, speechbutton1, ui_tts_conn):
+        if self.Speech.isChecked():
+            self.Speech.setStyleSheet(ButtonInfo1)
+            speechbutton1.send(1)
+            ui_tts_conn.put('pause')
+            # ui_tts_conn.send('pause')
+        else:
+            self.Speech.setStyleSheet(ButtonInfo)
+            speechbutton1.send(0)
+            ui_tts_conn.put('unpause')
+            # ui_tts_conn.send('unpause')
 
 
     def openWindow(self):
@@ -311,9 +335,9 @@ class App(QWidget):
         return (str1.join(s))
 
 
-def setup(textqueue, conn2):
+def setup(textqueue, conn2, speechbutton1, ui_tts_conn):
     app = QApplication(sys.argv)
-    a = App(conn2, textqueue)
+    a = App(conn2, textqueue, speechbutton1, ui_tts_conn)
     c = a.palette()
     #c.setColor(a.backgroundRole(), Qt.gray)
     c.setBrush(QPalette.Background,QBrush(QPixmap("BackgroundImage.png")))

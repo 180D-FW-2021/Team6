@@ -12,7 +12,9 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 # TechVidvan hand Gesture Recognizer
-import README_UI as UI
+# import UI.README_UI as ui
+import README_UI as ui
+
 # import necessary packages
 
 import cv2
@@ -258,7 +260,7 @@ def text_recognition(textqueue):
 
 def ui_image_test(textqueue,audioqueue):
     import config
-    t1 = threading.Thread(target=UI.setup, args=(textqueue,))
+    t1 = threading.Thread(target=ui.setup, args=(textqueue,))
     t2 = threading.Thread(target=image_test, args=(textqueue,))
     t3 = threading.Thread(target=speechtts.process_text, args=(textqueue, audioqueue))
 
@@ -278,9 +280,9 @@ def posefeed(imagequeue):
         except Empty as e:
             pass
 
-def ui_comms_process(textqueue, audioqueue, conn2):
+def ui_comms_process(textqueue, audioqueue, conn2, speechbutton1, ui_tts_conn):
     import config
-    t1 = threading.Thread(target=UI.setup, args=(textqueue, conn2))
+    t1 = threading.Thread(target=ui.setup, args=(textqueue, conn2, speechbutton1, ui_tts_conn))
     t2 = threading.Thread(target=text_recognition, args=(textqueue,))
     t3 = threading.Thread(target=speechtts.process_text, args=(textqueue, audioqueue))
 
@@ -307,18 +309,21 @@ def main():
     commandsqueue = Queue()
     audioqueue = Queue()
     conn1, conn2 = Pipe()
+    speechbutton1, speechbutton2 = Pipe()
+    ui_tts_conn, tts_ui_conn = Pipe()
 
-    p2 = Process(target=speechtts.speech, args=(commandsqueue,))
+    p2 = Process(target=speechtts.speech, args=(commandsqueue,speechbutton2))
     # send commands to tts
 
     p3 = Process(target=pose.init, args=(commandsqueue, path, conn1))
     # send commands to tts
 
-    p4 = Process(target=speechtts.tts, args=(commandsqueue,audioqueue))
+    p4 = Process(target=speechtts.tts, args=(commandsqueue, audioqueue, tts_ui_conn))
     # read from textqueue
     # get sigs from pose and speech
 
-    p7 = Process(target=ui_comms_process, args=(textqueue,audioqueue, conn2))
+    p7 = Process(target=ui_comms_process, args=(textqueue, audioqueue, conn2, speechbutton1, \
+                    commandsqueue))
 
     print( 'processes start')
 
