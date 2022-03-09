@@ -93,23 +93,27 @@ def read(audioqueue, started, paused, play_count):
                     print(str(e))
     '''
     if not pygame.mixer.music.get_busy():
-        try:
-            aud = audioqueue.get()
-            play_count += 1
-        except Empty as e:
-            print('no audio files yet')
-        else:
-            pygame.mixer.music.load(aud)
-            pygame.mixer.music.play()
-            started = True
+        if config.started and config.paused:
             paused = False
+            pygame.mixer.music.unpause()
+        else:
+            try:
+                aud = audioqueue.get()
+                play_count += 1
+            except Empty as e:
+                print('no audio files yet')
+            else:
+                pygame.mixer.music.load(aud)
+                pygame.mixer.music.play()
+                config.started = True
+                config.paused = False
     return started, paused, play_count
 
 
 def stop(started, paused):
     print('stop function')
     config.started = False
-    config.paused = True
+    config.paused = False 
     pygame.mixer.music.stop()
 
 
@@ -118,8 +122,9 @@ def pause(started, paused):
     config.paused = True
     pygame.mixer.music.pause()
 
+# might not need this anymore TODO
 def unpause(started, paused):
-    config.paused = False
+    paused = False
     pygame.mixer.music.unpause()
 
 def volumeUp():
@@ -150,7 +155,7 @@ def speech(commandsqueue, speechbutton2):
                 speech = speech.split()[0]
                 # print("Command given: " + speech)
 
-                if speech == "start":
+                if speech == "start" or speech == "play":
                     phrase = "starting text reading"
                     # read()
                     commandsqueue.put('start')
@@ -163,9 +168,6 @@ def speech(commandsqueue, speechbutton2):
                     phrase = "pausing text reading"
                     # pause()
                     commandsqueue.put('pause')
-                elif speech == "play":
-                    phrase = "resuming text reading"
-                    commandsqueue.put('unpause')
                 elif speech == "louder":
                     phrase = "volume up"
                 elif speech == "softer":
@@ -214,22 +216,19 @@ def tts(commandsqueue, audioqueue, tts_ui_conn):
         '''
         try:
             cmd = commandsqueue.get()
-            print(cmd)
+            print(cmd, config.started, config.paused)
             if cmd == 'start':
-                print( 'got start' )
                 read(audioqueue, started, paused, play_count)
             elif cmd == 'stop':
                 stop(started, paused)
             elif cmd == 'pause':
                 pause(started, paused)
-            elif cmd == 'unpause':
-                unpause(started, paused)
            
         except Empty as e:
             pass
 
-        if started and not paused and not pygame.mixer.music.get_busy():
-            started = False
+        if config.started and not config.paused and not pygame.mixer.music.get_busy():
+            config.started = False
             print( 'music end' )
             # play_count +=1
 

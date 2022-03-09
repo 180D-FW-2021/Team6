@@ -157,7 +157,6 @@ class App(QWidget):
         self.Speech = QPushButton("Speech Recognition", self)
         self.Speech.setObjectName("Speech Recognition")
         self.Speech.setGeometry(QtCore.QRect(650, 740, 250, 41))
-        # self.Speech.setAutoRepeat(True)
         self.Speech.resize(250, 75)
         self.Speech.setFont(QFont('Times', 15))
         self.Speech.setCheckable(True)
@@ -165,6 +164,21 @@ class App(QWidget):
                                             speechbutton1, ui_tts_conn))
         self.Speech.setStyleSheet(ButtonInfo)
 
+        self.Play = QPushButton("Play", self)
+        self.Play.setObjectName("Play")
+        self.Play.setGeometry(QtCore.QRect(650, 820, 250, 41))
+        self.Play.resize(250, 75)
+        self.Play.setFont(QFont('times', 15))
+        self.Play.clicked.connect(lambda: self.handlePlay(ui_tts_conn))
+        self.Play.setStyleSheet(ButtonInfo)
+
+        self.Pause = QPushButton("Pause", self)
+        self.Pause.setObjectName("Pause")
+        self.Pause.setGeometry(QtCore.QRect(650, 900, 250, 41))
+        self.Pause.resize(250, 75)
+        self.Pause.setFont(QFont('times', 15))
+        self.Pause.clicked.connect(lambda: self.handlePause(ui_tts_conn))
+        self.Pause.setStyleSheet(ButtonInfo)
         # Buttons ------------------------------------------------------------
     
 
@@ -304,9 +318,14 @@ class App(QWidget):
         else:
             self.Speech.setStyleSheet(ButtonInfo)
             speechbutton1.send(0)
-            ui_tts_conn.put('unpause')
+            ui_tts_conn.put('start')
             # ui_tts_conn.send('unpause')
 
+    def handlePlay(self, ui_tts_conn):
+        ui_tts_conn.put('start')
+
+    def handlePause(self, ui_tts_conn):
+        ui_tts_conn.put('pause')
 
     def openWindow(self):
         self.window = QtWidgets.QMainWindow()
