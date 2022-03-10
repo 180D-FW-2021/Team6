@@ -106,6 +106,7 @@ class App(QWidget):
              background-color:rgb(49, 229, 196);
         }
         """
+
         self.Loadimage = QPushButton("Load Image", self)
         self.Loadimage.setObjectName("Load Image")
         self.Loadimage.setGeometry(QtCore.QRect(100, 740, 250, 41))
@@ -154,33 +155,56 @@ class App(QWidget):
         self.Instructions.clicked.connect(self.openWindow)
         self.Instructions.setStyleSheet(ButtonInfo)
 
-        self.Speech = QPushButton("Speech Recognition", self)
+        self.Speech = QPushButton("", self)
         self.Speech.setObjectName("Speech Recognition")
         self.Speech.setGeometry(QtCore.QRect(650, 740, 250, 41))
-        self.Speech.resize(250, 75)
+        self.Speech.resize(75, 75)
         self.Speech.setFont(QFont('Times', 15))
         self.Speech.setCheckable(True)
-        self.Speech.clicked.connect(lambda: self.handleSpeech(ButtonInfo, ButtonInfo_toggled, \
-                                            speechbutton1, ui_tts_conn))
+        
+        # self.Speech.clicked.connect(lambda: self.handleSpeech(ButtonInfo, ButtonInfo_toggled, \
+        #                                     speechbutton1, ui_tts_conn))
+        self.Speech.setIcon(QIcon(QPixmap("Mic_Off.png")))
+        self.Speech.setIconSize(QSize(75,75))
+        self.Speech.clicked.connect(self.IconToggle)
         self.Speech.setStyleSheet(ButtonInfo)
 
-        self.Play = QPushButton("Play", self)
+        self.Play = QPushButton("", self)
         self.Play.setObjectName("Play")
         self.Play.setGeometry(QtCore.QRect(650, 820, 250, 41))
-        self.Play.resize(250, 75)
+        self.Play.resize(75, 75)
         self.Play.setFont(QFont('times', 15))
+        self.Play.setIcon(QIcon(QPixmap("Start.png")))
+        self.Play.setIconSize(QSize(50,50))
         self.Play.clicked.connect(lambda: self.handlePlay(ui_tts_conn))
         self.Play.setStyleSheet(ButtonInfo)
 
-        self.Pause = QPushButton("Pause", self)
+        self.Pause = QPushButton("", self)
         self.Pause.setObjectName("Pause")
         self.Pause.setGeometry(QtCore.QRect(650, 900, 250, 41))
-        self.Pause.resize(250, 75)
+        self.Pause.resize(75, 75)
         self.Pause.setFont(QFont('times', 15))
+        self.Pause.setIcon(QIcon(QPixmap("Pause.png")))
+        self.Pause.setIconSize(QSize(50,50))
         self.Pause.clicked.connect(lambda: self.handlePause(ui_tts_conn))
         self.Pause.setStyleSheet(ButtonInfo)
+
+        # self.Pause = QtGui.QPushButton('', self)
+        # self.Pause.clicked.connect(lambda: self.handlePause(ui_tts_conn))
+        # self.Pause.setIcon(QtGui.QIcon('Mic_On.png'))
+        # self.Pause.setIconSize(QtCore.QSize(24,24))
+        # #self.Pause.setGeometry(QtCore.QRect(650, 900, 250, 41))
         # Buttons ------------------------------------------------------------
     
+    def IconToggle(self):
+        if self.Speech.isChecked():
+            self.Speech.setIcon(QIcon(QPixmap("Mic_On.png")))
+            self.Speech.setIconSize(QSize(75,75))
+            #self.handleSpeech have the mic turned on 
+        else:
+            self.Speech.setIcon(QIcon(QPixmap("Mic_Off.png")))
+            self.Speech.setIconSize(QSize(75,75))
+            #Turn off the mic with function 
 
     def closeEvent(self, event):
         self.thread.stop()
