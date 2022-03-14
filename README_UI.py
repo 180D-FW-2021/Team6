@@ -163,11 +163,9 @@ class App(QWidget):
         self.Speech.setFont(QFont('Times', 15))
         self.Speech.setCheckable(True)
         
-        # self.Speech.clicked.connect(lambda: self.handleSpeech(ButtonInfo, ButtonInfo_toggled, \
-        #                                     speechbutton1, ui_tts_conn))
+        self.Speech.clicked.connect(lambda: self.handleSpeech(speechbutton1, ui_tts_conn))
         self.Speech.setIcon(QIcon(QPixmap("Mic_Off.png")))
         self.Speech.setIconSize(QSize(75,75))
-        self.Speech.clicked.connect(self.IconToggle)
         self.Speech.setStyleSheet(ButtonInfo)
 
         self.Play = QPushButton("", self)
@@ -226,15 +224,6 @@ class App(QWidget):
         self.wifi.setStyleSheet("background:rgb(0,0,0,0);")
         self.wifi.setIconSize(QSize(50,50))
 
-    def IconToggle(self):
-        if self.Speech.isChecked():
-            self.Speech.setIcon(QIcon(QPixmap("Mic_On.png")))
-            self.Speech.setIconSize(QSize(75,75))
-            #self.handleSpeech have the mic turned on 
-        else:
-            self.Speech.setIcon(QIcon(QPixmap("Mic_Off.png")))
-            self.Speech.setIconSize(QSize(75,75))
-            #Turn off the mic with function 
 
     def IconToggle2(self):
         if self.Hand_On.isChecked():
@@ -374,14 +363,18 @@ class App(QWidget):
                 else:
                     pixmap.save(fileName)
         
-    def handleSpeech(self, ButtonInfo, ButtonInfo1, speechbutton1, ui_tts_conn):
+    def handleSpeech(self, speechbutton1, ui_tts_conn):
         if self.Speech.isChecked():
-            self.Speech.setStyleSheet(ButtonInfo1)
+            self.Speech.setIcon(QIcon(QPixmap("Mic_On.png")))
+            self.Speech.setIconSize(QSize(75,75))
+            #self.handleSpeech have the mic turned on 
             speechbutton1.send(1)
             ui_tts_conn.put('pause')
             # ui_tts_conn.send('pause')
         else:
-            self.Speech.setStyleSheet(ButtonInfo)
+            self.Speech.setIcon(QIcon(QPixmap("Mic_Off.png")))
+            self.Speech.setIconSize(QSize(75,75))
+            #Turn off the mic with function 
             speechbutton1.send(0)
             ui_tts_conn.put('start')
             # ui_tts_conn.send('unpause')
