@@ -89,8 +89,9 @@ def image_test(textqueue):
 
 def on_connect(client, userdata, flags, rc):
     print("Connection returned result: "+str(rc))
-    config.sampleText.append('Connected')
-    config.start = 1
+    #config.sampleText.append('Connected')
+    #config.start = 1
+    config.connect = 1
     # Subscribing in on_connect() means that if we lose the connection and
     # reconnect then subscriptions will be renewed.
     client.subscribe("ece180d/text", qos=1)
@@ -99,6 +100,7 @@ def on_connect(client, userdata, flags, rc):
 
 
 def on_disconnect(client, userdata, rc):
+    config.connect = 0
     if rc != 0:
         print('Unexpected Disconnect')
     else:
