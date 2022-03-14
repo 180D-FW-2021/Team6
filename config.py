@@ -7,7 +7,7 @@ gotImage = 0
 ImagePass = None
 cap = None
 frame = None
-
+connect = 0
 start = 0
 
 

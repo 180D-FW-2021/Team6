@@ -50,6 +50,7 @@ class App(QWidget):
 
         timer = QTimer(self)
         timer.timeout.connect(self.updateScreen)
+        #timer.timeout.connect(self.wifiupdate)
         timer.start(10)
 
         # Image area ---------------------------------------------------
@@ -220,6 +221,11 @@ class App(QWidget):
         self.Hand_On.clicked.connect(self.IconToggle2)
         self.Hand_On.setStyleSheet(ButtonInfo)
     
+        self.wifi = QPushButton("",self)
+        self.wifi.setGeometry(QtCore.QRect(30, 50, 50, 50))
+        self.wifi.setStyleSheet("background:rgb(0,0,0,0);")
+        self.wifi.setIconSize(QSize(50,50))
+
     def IconToggle(self):
         if self.Speech.isChecked():
             self.Speech.setIcon(QIcon(QPixmap("Mic_On.png")))
@@ -239,8 +245,7 @@ class App(QWidget):
             self.Hand_On.setIcon(QIcon(QPixmap("Hand_On.png")))
             self.Hand_On.setIconSize(QSize(75,75))
             #Turn off the mic with function 
-
-
+        
 
     def closeEvent(self, event):
         self.thread.stop()
@@ -404,6 +409,11 @@ class App(QWidget):
             self.setText(config.sampleText)
             self.setImage(config.ImagePass)
             config.start = 0
+        if config.connect == 1:
+            self.wifi.setIcon(QIcon(QPixmap("Wifi_On.png")))
+        else:
+            self.wifi.setIcon(QIcon(QPixmap("Wifi_Off.png")))
+        
 
     def listToString(self, s):
 
