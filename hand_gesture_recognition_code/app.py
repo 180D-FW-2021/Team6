@@ -97,7 +97,8 @@ def main(commandsqueue, path, conn1):
 
     #  ########################################################################
     mode = 0
-
+    count = 0
+    pose = None
 
     while True:
         '''
@@ -179,14 +180,21 @@ def main(commandsqueue, path, conn1):
                     point_history_classifier_labels[most_common_fg_id[0][0]],
                 )
                 result = keypoint_classifier_labels[hand_sign_id]
-                if result == 'Play':
-                    commandsqueue.put('start')
-                elif result == 'Pause':
-                    commandsqueue.put('pause')
-                elif result == 'Volume Up':
-                    commandsqueue.put('louder')
-                elif result == 'Volume Down':
-                    commandsqueue.put('softer')
+               
+                if count > 10:
+                    if result == 'Play':
+                        commandsqueue.put('start')
+                    elif result == 'Pause':
+                        commandsqueue.put('pause')
+                    elif result == 'Volume Up':
+                        commandsqueue.put('louder')
+                    elif result == 'Volume Down':
+                        commandsqueue.put('softer')
+                    count = 0
+
+                if pose == result:
+                    count = count + 1
+                pose = result
 
         else:
             point_history.append([0, 0])
