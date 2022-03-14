@@ -128,11 +128,11 @@ def unpause(started, paused):
     pygame.mixer.music.unpause()
 
 def volumeUp():
-    cur_vol = pygame.mixer.get_volume()
+    cur_vol = pygame.mixer.music.get_volume()
     pygame.mixer.set_volume(cur_vol + 0.1)
 
 def volumeDown():
-    cur_vol = pygame.mixer.get_volume()
+    cur_vol = pygame.mixer.music.get_volume()
     pygame.mixer.set_volume(cur_vol - 0.1)
 
 def calibrate(r, m):
@@ -152,26 +152,20 @@ def speech(commandsqueue, speechbutton2):
                 speech = r.recognize_google(audio)
                 print("You said: " + speech)
 
-                speech = speech.split()[0]
-                # print("Command given: " + speech)
+                speech = speech.split()[0:2]
 
-                if speech == "start" or speech == "play":
-                    phrase = "starting text reading"
-                    # read()
+                if "play" in speech:
                     commandsqueue.put('start')
                     # pygame.mixer.music.set_endevent(MUSIC_END)
-                elif speech == "stop":
-                    phrase = "stopping text reading"
-                    # pause()
+                elif "stop" in speech:
                     commandsqueue.put('stop')
-                elif speech == "pause":
-                    phrase = "pausing text reading"
-                    # pause()
+                elif "pause" in speech:
                     commandsqueue.put('pause')
-                elif speech == "louder":
-                    phrase = "volume up"
-                elif speech == "softer":
-                    phrase = "volume down"
+                elif "volume" in speech:
+                    if "up" in speech:
+                        commandsqueue.put('louder')
+                    if 'down' in speech:
+                        commandsqueue.put('softer')
                 # TODO speeding up/down currently not implemented, 
                 #      complications with the time required to resample the wav file
                     '''
@@ -223,6 +217,10 @@ def tts(commandsqueue, audioqueue, tts_ui_conn):
                 stop(started, paused)
             elif cmd == 'pause':
                 pause(started, paused)
+            elif cmd == 'louder':
+                volumeUp()
+            elif cmd == 'softer':
+                volumeDown()
            
         except Empty as e:
             pass
