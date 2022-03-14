@@ -93,23 +93,27 @@ def read(audioqueue, started, paused, play_count):
                     print(str(e))
     '''
     if not pygame.mixer.music.get_busy():
-        try:
-            aud = audioqueue.get()
-            play_count += 1
-        except Empty as e:
-            print('no audio files yet')
-        else:
-            pygame.mixer.music.load(aud)
-            pygame.mixer.music.play()
-            started = True
+        if config.started and config.paused:
             paused = False
+            pygame.mixer.music.unpause()
+        else:
+            try:
+                aud = audioqueue.get()
+                play_count += 1
+            except Empty as e:
+                print('no audio files yet')
+            else:
+                pygame.mixer.music.load(aud)
+                pygame.mixer.music.play()
+                config.started = True
+                config.paused = False
     return started, paused, play_count
 
 
 def stop(started, paused):
     print('stop function')
     config.started = False
-    config.paused = True
+    config.paused = False 
     pygame.mixer.music.stop()
 
 
@@ -118,8 +122,9 @@ def pause(started, paused):
     config.paused = True
     pygame.mixer.music.pause()
 
+# might not need this anymore TODO
 def unpause(started, paused):
-    config.paused = False
+    paused = False
     pygame.mixer.music.unpause()
 
 def volumeUp():
@@ -134,60 +139,59 @@ def calibrate(r, m):
     with m as source: 
         r.adjust_for_ambient_noise(source)
 
-def speech(commandsqueue):
+def speech(commandsqueue, speechbutton2):
     r = sr.Recognizer()
     while (1):
-        with sr.Microphone() as source:
-            print("say something!")
-            time.sleep(1)
-            audio = r.listen(source)
-        try:
-            speech = r.recognize_google(audio)
-            print("You said: " + speech)
+        val = speechbutton2.recv()
+        if val == 1:
+            with sr.Microphone() as source:
+                print("say something!")
+                time.sleep(1)
+                audio = r.listen(source)
+            try:
+                speech = r.recognize_google(audio)
+                print("You said: " + speech)
 
-            speech = speech.split()[0]
-            # print("Command given: " + speech)
+                speech = speech.split()[0]
+                # print("Command given: " + speech)
 
-            if speech == "start":
-                phrase = "starting text reading"
-                # read()
-                commandsqueue.put('start')
-                # pygame.mixer.music.set_endevent(MUSIC_END)
-            elif speech == "stop":
-                phrase = "stopping text reading"
-                # pause()
-                commandsqueue.put('stop')
-            elif speech == "pause":
-                phrase = "pausing text reading"
-                # pause()
-                commandsqueue.put('pause')
-            elif speech == "play":
-                phrase = "resuming text reading"
-                commandsqueue.put('unpause')
-            elif speech == "louder":
-                phrase = "volume up"
-            elif speech == "softer":
-                phrase = "volume down"
-            # TODO speeding up/down currently not implemented, 
-            #      complications with the time required to resample the wav file
-                '''
-                elif speech == "speed up":
-                        phrase = "speeding up"
-                        engine.say(phrase)
-                        print(phrase)
-                elif speech == ("slow down"):
-                        phrase = "slowing down"
-                        engine.say(phrase)
-                        print(phrase)
-                '''
+                if speech == "start" or speech == "play":
+                    phrase = "starting text reading"
+                    # read()
+                    commandsqueue.put('start')
+                    # pygame.mixer.music.set_endevent(MUSIC_END)
+                elif speech == "stop":
+                    phrase = "stopping text reading"
+                    # pause()
+                    commandsqueue.put('stop')
+                elif speech == "pause":
+                    phrase = "pausing text reading"
+                    # pause()
+                    commandsqueue.put('pause')
+                elif speech == "louder":
+                    phrase = "volume up"
+                elif speech == "softer":
+                    phrase = "volume down"
+                # TODO speeding up/down currently not implemented, 
+                #      complications with the time required to resample the wav file
+                    '''
+                    elif speech == "speed up":
+                            phrase = "speeding up"
+                            engine.say(phrase)
+                            print(phrase)
+                    elif speech == ("slow down"):
+                            phrase = "slowing down"
+                            engine.say(phrase)
+                            print(phrase)
+                    '''
 
-        except sr.UnknownValueError:
-                print("Google Speech Recognition could not understand audio")
-        except sr.RequestError as e:
-                print("Error; {0}".format(e))
+            except sr.UnknownValueError:
+                    print("Google Speech Recognition could not understand audio")
+            except sr.RequestError as e:
+                    print("Error; {0}".format(e))
 
 
-def tts(commandsqueue, audioqueue):
+def tts(commandsqueue, audioqueue, tts_ui_conn):
     started = False
     paused = False
     play_count = 0
@@ -212,22 +216,19 @@ def tts(commandsqueue, audioqueue):
         '''
         try:
             cmd = commandsqueue.get()
-            print(cmd)
+            print(cmd, config.started, config.paused)
             if cmd == 'start':
-                print( 'got start' )
                 read(audioqueue, started, paused, play_count)
             elif cmd == 'stop':
                 stop(started, paused)
             elif cmd == 'pause':
                 pause(started, paused)
-            elif cmd == 'unpause':
-                unpause(started, paused)
            
         except Empty as e:
             pass
 
-        if started and not paused and not pygame.mixer.music.get_busy():
-            started = False
+        if config.started and not config.paused and not pygame.mixer.music.get_busy():
+            config.started = False
             print( 'music end' )
             # play_count +=1
 
