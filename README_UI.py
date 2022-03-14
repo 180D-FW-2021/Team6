@@ -65,7 +65,7 @@ class App(QWidget):
 
         # Text area ------------------------------------------------------
         self.textEdit = QTextEdit(self)
-        self.textEdit.setGeometry(QtCore.QRect(30, 100, 711, 600))
+        self.textEdit.setGeometry(QtCore.QRect(50, 100, 711, 600))
         font = QtGui.QFont()
         font.setPointSize(20)
         self.textEdit.setFont(font)
