@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+
 import csv
 import copy
 import argparse
@@ -11,10 +12,9 @@ import cv2 as cv
 import numpy as np
 import mediapipe as mp
 
-from utils import CvFpsCalc
-from model import KeyPointClassifier
-from model import PointHistoryClassifier
-
+from hand_gesture_recognition_code.utils import CvFpsCalc
+from hand_gesture_recognition_code.model import KeyPointClassifier
+from hand_gesture_recognition_code.model import PointHistoryClassifier
 
 def get_args():
     parser = argparse.ArgumentParser()
@@ -38,7 +38,7 @@ def get_args():
     return args
 
 
-def main():
+def main(commandsqueue, path, conn1):
     # Argument parsing #################################################################
     args = get_args()
 
@@ -71,14 +71,14 @@ def main():
     point_history_classifier = PointHistoryClassifier()
 
     # Read labels ###########################################################
-    with open('model/keypoint_classifier/keypoint_classifier_label.csv',
+    with open(path + '/hand_gesture_recognition_code/model/keypoint_classifier/keypoint_classifier_label.csv',
               encoding='utf-8-sig') as f:
         keypoint_classifier_labels = csv.reader(f)
         keypoint_classifier_labels = [
             row[0] for row in keypoint_classifier_labels
         ]
     with open(
-            'model/point_history_classifier/point_history_classifier_label.csv',
+            path + '/hand_gesture_recognition_code/model/point_history_classifier/point_history_classifier_label.csv',
             encoding='utf-8-sig') as f:
         point_history_classifier_labels = csv.reader(f)
         point_history_classifier_labels = [
@@ -98,7 +98,17 @@ def main():
     #  ########################################################################
     mode = 0
 
+
     while True:
+        '''
+        val = conn1.recv()
+        if val == 0:
+            cap.release()
+            while(conn1.recv() != 1):
+                print('pose off')
+            cap = cv.VideoCapture(cap_device)
+        '''
+
         fps = cvFpsCalc.get()
 
         # Process Key (ESC: end) #################################################
@@ -169,6 +179,15 @@ def main():
                     point_history_classifier_labels[most_common_fg_id[0][0]],
                 )
                 result = keypoint_classifier_labels[hand_sign_id]
+                if result == 'Play':
+                    commandsqueue.put('start')
+                elif result == 'Pause':
+                    commandsqueue.put('pause')
+                elif result == 'Volume Up':
+                    commandsqueue.put('louder')
+                elif result == 'Volume Down':
+                    commandsqueue.put('softer')
+
         else:
             point_history.append([0, 0])
 
@@ -176,7 +195,8 @@ def main():
         debug_image = draw_info(debug_image, fps, mode, number)
 
         # Screen reflection #############################################################
-        cv.imshow('Hand Gesture Recognition', debug_image)
+        # cv.imshow('Hand Gesture Recognition', debug_image)
+        conn1.send(debug_image)
 
     cap.release()
     cv.destroyAllWindows()
@@ -283,12 +303,12 @@ def logging_csv(number, mode, landmark_list, point_history_list):
     if mode == 0:
         pass
     if mode == 1 and (0 <= number <= 9):
-        csv_path = 'model/keypoint_classifier/keypoint.csv'
+        csv_path = path + '/hand_gesture_recognition_code/model/keypoint_classifier/keypoint.csv'
         with open(csv_path, 'a', newline="") as f:
             writer = csv.writer(f)
             writer.writerow([number, *landmark_list])
     if mode == 2 and (0 <= number <= 9):
-        csv_path = 'model/point_history_classifier/point_history.csv'
+        csv_path = path + '/hand_gesture_recognition_code/model/point_history_classifier/point_history.csv'
         with open(csv_path, 'a', newline="") as f:
             writer = csv.writer(f)
             writer.writerow([number, *point_history_list])

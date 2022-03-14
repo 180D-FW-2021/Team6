@@ -27,7 +27,8 @@ import numpy as np
 # import functions
 import config
 import speech_tts.tts1 as speechtts
-import hand_gesture_recognition_code.TechVidvan_hand_gesture_detection as pose
+# import hand_gesture_recognition_code.TechVidvan_hand_gesture_detection as pose
+import hand_gesture_recognition_code.app as pose
 
 # import Communications.gesture_control_subscriber as comms
 
@@ -318,7 +319,7 @@ def main():
     p2 = Process(target=speechtts.speech, args=(commandsqueue,speechbutton2))
     # send commands to tts
 
-    p3 = Process(target=pose.init, args=(commandsqueue, path, conn1))
+    p3 = Process(target=pose.main, args=(commandsqueue, path, conn1))
     # send commands to tts
 
     p4 = Process(target=speechtts.tts, args=(commandsqueue, audioqueue, tts_ui_conn))

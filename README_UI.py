@@ -219,7 +219,7 @@ class App(QWidget):
         self.Hand_On.setCheckable(True)
         self.Hand_On.setIcon(QIcon(QPixmap("Hand_On.png")))
         self.Hand_On.setIconSize(QSize(75,75))
-        self.Hand_On.clicked.connect(self.IconToggle2)
+        self.Speech.clicked.connect(lambda: self.handlePose(ButtonInfo, ButtonInfo_toggled, speechbutton1, ui_tts_conn))
         self.Hand_On.setStyleSheet(ButtonInfo)
     
         self.wifi = QPushButton("",self)
@@ -228,15 +228,6 @@ class App(QWidget):
         self.wifi.setIconSize(QSize(50,50))
 
 
-    def IconToggle2(self):
-        if self.Hand_On.isChecked():
-            self.Hand_On.setIcon(QIcon(QPixmap("Hand_Off.png")))
-            self.Hand_On.setIconSize(QSize(75,75))
-            #self.handleSpeech have the mic turned on 
-        else:
-            self.Hand_On.setIcon(QIcon(QPixmap("Hand_On.png")))
-            self.Hand_On.setIconSize(QSize(75,75))
-            #Turn off the mic with function 
 
     def keyPressEvent(self, event):
         key = event.key()
@@ -394,6 +385,18 @@ class App(QWidget):
             self.Speech.setStyleSheet(ButtonInfo)
             # ui_tts_conn.send('unpause')
 
+    def handlePose(self, ButtonInfo, ButtonInfo_toggled, conn2, ui_tts_conn):
+        if self.Hand_On.isChecked():
+            self.Hand_On.setIcon(QIcon(QPixmap("Hand_Off.png")))
+            self.Hand_On.setIconSize(QSize(75,75))
+            conn2.send(0)
+            self.Hand_On.setStyleSheet(ButtonInfo_toggled)
+        else:
+            self.Hand_On.setIcon(QIcon(QPixmap("Hand_On.png")))
+            self.Hand_On.setIconSize(QSize(75,75))
+            conn2.send(1)
+            self.Hand_On.setStyleSheet(ButtonInfo)
+
     def handlePlay(self, ui_tts_conn):
         ui_tts_conn.put('start')
 
@@ -406,7 +409,7 @@ class App(QWidget):
     def handleVDown(self, ui_tts_conn):
         ui_tts_conn.put('softer')
 
-def openWindow(self):
+    def openWindow(self):
         self.window = QtWidgets.QMainWindow()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self.window)
