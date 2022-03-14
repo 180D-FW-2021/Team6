@@ -109,7 +109,7 @@ class App(QWidget):
 
         self.Loadimage = QPushButton("Load Image", self)
         self.Loadimage.setObjectName("Load Image")
-        self.Loadimage.setGeometry(QtCore.QRect(100, 740, 250, 41))
+        self.Loadimage.setGeometry(QtCore.QRect(50, 740, 250, 41))
         self.Loadimage.resize(250, 75)
         self.Loadimage.setFont(QFont('Times', 15))
         self.Loadimage.clicked.connect(self.getImage)
@@ -117,7 +117,7 @@ class App(QWidget):
 
         self.Run = QPushButton("Run", self)
         self.Run.setObjectName("Run")
-        self.Run.setGeometry(QtCore.QRect(100, 820, 250, 41))
+        self.Run.setGeometry(QtCore.QRect(50, 820, 250, 41))
         self.Run.resize(250, 75)
         self.Run.setFont(QFont('Times', 15))
         self.Run.clicked.connect(self.extractText)
@@ -125,7 +125,7 @@ class App(QWidget):
 
         self.Clear = QPushButton("Clear", self)
         self.Clear.setObjectName("Clear")
-        self.Clear.setGeometry(QtCore.QRect(100, 900, 250, 41))
+        self.Clear.setGeometry(QtCore.QRect(50, 900, 250, 41))
         self.Clear.resize(250, 75)
         self.Clear.setFont(QFont('Times', 15))
         self.Clear.clicked.connect(self.clearText)
@@ -133,7 +133,7 @@ class App(QWidget):
 
         self.Save = QPushButton("Save text", self)
         self.Save.setObjectName("Save text")
-        self.Save.setGeometry(QtCore.QRect(375, 740, 250, 41))
+        self.Save.setGeometry(QtCore.QRect(325, 740, 250, 41))
         self.Save.resize(250, 75)
         self.Save.setFont(QFont('Times', 15))
         self.Save.clicked.connect(self.saveText)
@@ -141,7 +141,7 @@ class App(QWidget):
 
         self.SaveImage = QPushButton("Save Image", self)
         self.SaveImage.setObjectName("Save Image")
-        self.SaveImage.setGeometry(QtCore.QRect(375, 820, 250, 41))
+        self.SaveImage.setGeometry(QtCore.QRect(325, 820, 250, 41))
         self.SaveImage.resize(250, 75)
         self.SaveImage.setFont(QFont('Times', 15))
         self.SaveImage.clicked.connect(self.saveImage)
@@ -149,7 +149,7 @@ class App(QWidget):
 
         self.Instructions = QPushButton("Instructions", self)
         self.Instructions.setObjectName("Instructions")
-        self.Instructions.setGeometry(QtCore.QRect(375, 900, 250, 41))
+        self.Instructions.setGeometry(QtCore.QRect(325, 900, 250, 41))
         self.Instructions.resize(250, 75)
         self.Instructions.setFont(QFont('Times', 15))
         self.Instructions.clicked.connect(self.openWindow)
@@ -157,7 +157,7 @@ class App(QWidget):
 
         self.Speech = QPushButton("", self)
         self.Speech.setObjectName("Speech Recognition")
-        self.Speech.setGeometry(QtCore.QRect(650, 740, 250, 41))
+        self.Speech.setGeometry(QtCore.QRect(600, 740, 250, 41))
         self.Speech.resize(75, 75)
         self.Speech.setFont(QFont('Times', 15))
         self.Speech.setCheckable(True)
@@ -171,7 +171,7 @@ class App(QWidget):
 
         self.Play = QPushButton("", self)
         self.Play.setObjectName("Play")
-        self.Play.setGeometry(QtCore.QRect(650, 820, 250, 41))
+        self.Play.setGeometry(QtCore.QRect(600, 820, 250, 41))
         self.Play.resize(75, 75)
         self.Play.setFont(QFont('times', 15))
         self.Play.setIcon(QIcon(QPixmap("Start.png")))
@@ -181,7 +181,7 @@ class App(QWidget):
 
         self.Pause = QPushButton("", self)
         self.Pause.setObjectName("Pause")
-        self.Pause.setGeometry(QtCore.QRect(650, 900, 250, 41))
+        self.Pause.setGeometry(QtCore.QRect(600, 900, 250, 41))
         self.Pause.resize(75, 75)
         self.Pause.setFont(QFont('times', 15))
         self.Pause.setIcon(QIcon(QPixmap("Pause.png")))
@@ -189,12 +189,36 @@ class App(QWidget):
         self.Pause.clicked.connect(lambda: self.handlePause(ui_tts_conn))
         self.Pause.setStyleSheet(ButtonInfo)
 
-        # self.Pause = QtGui.QPushButton('', self)
-        # self.Pause.clicked.connect(lambda: self.handlePause(ui_tts_conn))
-        # self.Pause.setIcon(QtGui.QIcon('Mic_On.png'))
-        # self.Pause.setIconSize(QtCore.QSize(24,24))
-        # #self.Pause.setGeometry(QtCore.QRect(650, 900, 250, 41))
-        # Buttons ------------------------------------------------------------
+        self.VUp = QPushButton("", self)
+        self.VUp.setObjectName("V Up")
+        self.VUp.setGeometry(QtCore.QRect(700, 820, 250, 41))
+        self.VUp.resize(75, 75)
+        self.VUp.setFont(QFont('times', 15))
+        self.VUp.setIcon(QIcon(QPixmap("Volume_Up.png")))
+        self.VUp.setIconSize(QSize(100,100))
+        self.VUp.clicked.connect(lambda: self.handlePause(ui_tts_conn))
+        self.VUp.setStyleSheet(ButtonInfo)
+
+        self.VDown = QPushButton("", self)
+        self.VDown.setObjectName("V Down")
+        self.VDown.setGeometry(QtCore.QRect(700, 900, 250, 41))
+        self.VDown.resize(75, 75)
+        self.VDown.setFont(QFont('times', 15))
+        self.VDown.setIcon(QIcon(QPixmap("Volume_Down.png")))
+        self.VDown.setIconSize(QSize(100,100))
+        self.VDown.clicked.connect(lambda: self.handlePause(ui_tts_conn))
+        self.VDown.setStyleSheet(ButtonInfo)
+        
+        self.Hand_On = QPushButton("", self)
+        self.Hand_On.setObjectName("Gesture Recognition")
+        self.Hand_On.setGeometry(QtCore.QRect(700, 740, 250, 41))
+        self.Hand_On.resize(75, 75)
+        self.Hand_On.setFont(QFont('Times', 15))
+        self.Hand_On.setCheckable(True)
+        self.Hand_On.setIcon(QIcon(QPixmap("Hand_On.png")))
+        self.Hand_On.setIconSize(QSize(75,75))
+        self.Hand_On.clicked.connect(self.IconToggle2)
+        self.Hand_On.setStyleSheet(ButtonInfo)
     
     def IconToggle(self):
         if self.Speech.isChecked():
@@ -205,6 +229,18 @@ class App(QWidget):
             self.Speech.setIcon(QIcon(QPixmap("Mic_Off.png")))
             self.Speech.setIconSize(QSize(75,75))
             #Turn off the mic with function 
+
+    def IconToggle2(self):
+        if self.Hand_On.isChecked():
+            self.Hand_On.setIcon(QIcon(QPixmap("Hand_Off.png")))
+            self.Hand_On.setIconSize(QSize(75,75))
+            #self.handleSpeech have the mic turned on 
+        else:
+            self.Hand_On.setIcon(QIcon(QPixmap("Hand_On.png")))
+            self.Hand_On.setIconSize(QSize(75,75))
+            #Turn off the mic with function 
+
+
 
     def closeEvent(self, event):
         self.thread.stop()
