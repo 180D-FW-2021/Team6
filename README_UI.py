@@ -60,7 +60,7 @@ class App(QWidget):
         self.labelImage.setGeometry(QtCore.QRect(1000, 100, 711, 470))
         self.labelImage.setFrameShape(QtWidgets.QFrame.WinPanel)
         self.labelImage.setText("")
-        self.labelImage.setObjectName("labelImage")
+        #self.labelImage.rotate(-90)
         self.labelImage.setScaledContents(True)
         self.labelImage.setStyleSheet("background:rgb(218,217,212);")
         # Image area ---------------------------------------------------
@@ -81,7 +81,7 @@ class App(QWidget):
         # Webcam -------------------------------------------------------
         self.Webcam = QLabel(self)
         # self.Webcam.resize(640, 640)
-        self.Webcam.setGeometry(QtCore.QRect(1035, 530, 720, 470))
+        self.Webcam.setGeometry(QtCore.QRect(1035, 575, 720, 470))
         self.textLabel = QLabel('Webcam')
         self.thread = VideoThread(conn2)
         self.thread.change_pixmap_signal.connect(self.update_image)
