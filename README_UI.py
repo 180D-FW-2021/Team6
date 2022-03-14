@@ -81,7 +81,7 @@ class App(QWidget):
         # Webcam -------------------------------------------------------
         self.Webcam = QLabel(self)
         # self.Webcam.resize(640, 640)
-        self.Webcam.setGeometry(QtCore.QRect(1040, 575, 711, 470))
+        self.Webcam.setGeometry(QtCore.QRect(1035, 530, 720, 470))
         self.textLabel = QLabel('Webcam')
         self.thread = VideoThread(conn2)
         self.thread.change_pixmap_signal.connect(self.update_image)
