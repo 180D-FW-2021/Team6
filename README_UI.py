@@ -47,6 +47,8 @@ class App(QWidget):
         self.setWindowTitle("READEME")
         self.resize(1920, 1080)
         self.textqueue = textqueue
+        self.ui_tts_conn = ui_tts_conn
+        self.speechbutton1 = speechbutton1
 
         timer = QTimer(self)
         timer.timeout.connect(self.updateScreen)
@@ -73,6 +75,7 @@ class App(QWidget):
         self.textEdit.setFrameShadow(QtWidgets.QFrame.Plain)
         self.textEdit.setObjectName("textEdit")
         self.textEdit.setStyleSheet("background:rgb(218,217,212);")
+        self.textEdit.setReadOnly(True)
         # Text area ------------------------------------------------------
 
         # Webcam -------------------------------------------------------
@@ -234,7 +237,17 @@ class App(QWidget):
             self.Hand_On.setIcon(QIcon(QPixmap("Hand_On.png")))
             self.Hand_On.setIconSize(QSize(75,75))
             #Turn off the mic with function 
-        
+
+    def keyPressEvent(self, event):
+        key = event.key()
+        if key == QtCore.Qt.Key_Q: 
+            self.ui_tts_conn.put('start')
+        elif key == QtCore.Qt.Key_W:
+            self.ui_tts_conn.put('pause')
+        elif key == QtCore.Qt.Key_E:
+            self.ui_tts_conn.put('stop')
+        elif key == QtCore.Qt.Key_A:
+            self.Speech.click()
 
     def closeEvent(self, event):
         self.thread.stop()
