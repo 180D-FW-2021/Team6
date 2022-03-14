@@ -18,6 +18,7 @@ import README_UI as ui
 # import necessary packages
 
 import cv2
+from PIL import Image
 import numpy as np
 # import mediapipe as mp
 # import tensorflow as tf
@@ -26,7 +27,8 @@ import numpy as np
 # import functions
 import config
 import speech_tts.tts1 as speechtts
-import hand_gesture_recognition_code.TechVidvan_hand_gesture_detection as pose
+# import hand_gesture_recognition_code.TechVidvan_hand_gesture_detection as pose
+import hand_gesture_recognition_code.app as pose
 
 # import Communications.gesture_control_subscriber as comms
 
@@ -139,6 +141,8 @@ def on_message(client, userdata, message):
     print('image received')
 
     img = cv2.imread("receive.jpg", cv2.IMREAD_COLOR)
+    img = cv2.rotate(img, cv2.cv2.ROTATE_90_CLOCKWISE)
+    cv2.imwrite("receive.jpg", img)
     
     # New code: preprocessing if receive.jpg is the unpreprocessed image
     gray_image = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -317,7 +321,7 @@ def main():
     p2 = Process(target=speechtts.speech, args=(commandsqueue,speechbutton2))
     # send commands to tts
 
-    p3 = Process(target=pose.init, args=(commandsqueue, path, conn1))
+    p3 = Process(target=pose.main, args=(commandsqueue, path, conn1))
     # send commands to tts
 
     p4 = Process(target=speechtts.tts, args=(commandsqueue, audioqueue, tts_ui_conn))

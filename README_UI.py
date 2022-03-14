@@ -47,6 +47,8 @@ class App(QWidget):
         self.setWindowTitle("READEME")
         self.resize(1920, 1080)
         self.textqueue = textqueue
+        self.ui_tts_conn = ui_tts_conn
+        self.speechbutton1 = speechbutton1
 
         timer = QTimer(self)
         timer.timeout.connect(self.updateScreen)
@@ -73,12 +75,13 @@ class App(QWidget):
         self.textEdit.setFrameShadow(QtWidgets.QFrame.Plain)
         self.textEdit.setObjectName("textEdit")
         self.textEdit.setStyleSheet("background:rgb(218,217,212);")
+        self.textEdit.setReadOnly(True)
         # Text area ------------------------------------------------------
 
         # Webcam -------------------------------------------------------
         self.Webcam = QLabel(self)
         # self.Webcam.resize(640, 640)
-        self.Webcam.setGeometry(QtCore.QRect(1040, 575, 711, 470))
+        self.Webcam.setGeometry(QtCore.QRect(1035, 530, 720, 470))
         self.textLabel = QLabel('Webcam')
         self.thread = VideoThread(conn2)
         self.thread.change_pixmap_signal.connect(self.update_image)
@@ -163,11 +166,9 @@ class App(QWidget):
         self.Speech.setFont(QFont('Times', 15))
         self.Speech.setCheckable(True)
         
-        # self.Speech.clicked.connect(lambda: self.handleSpeech(ButtonInfo, ButtonInfo_toggled, \
-        #                                     speechbutton1, ui_tts_conn))
+        self.Speech.clicked.connect(lambda: self.handleSpeech(ButtonInfo, ButtonInfo_toggled, speechbutton1, ui_tts_conn))
         self.Speech.setIcon(QIcon(QPixmap("Mic_Off.png")))
         self.Speech.setIconSize(QSize(75,75))
-        self.Speech.clicked.connect(self.IconToggle)
         self.Speech.setStyleSheet(ButtonInfo)
 
         self.Play = QPushButton("", self)
@@ -197,7 +198,7 @@ class App(QWidget):
         self.VUp.setFont(QFont('times', 15))
         self.VUp.setIcon(QIcon(QPixmap("Volume_Up.png")))
         self.VUp.setIconSize(QSize(100,100))
-        self.VUp.clicked.connect(lambda: self.handlePause(ui_tts_conn))
+        self.VUp.clicked.connect(lambda: self.handleVUp(ui_tts_conn))
         self.VUp.setStyleSheet(ButtonInfo)
 
         self.VDown = QPushButton("", self)
@@ -207,7 +208,7 @@ class App(QWidget):
         self.VDown.setFont(QFont('times', 15))
         self.VDown.setIcon(QIcon(QPixmap("Volume_Down.png")))
         self.VDown.setIconSize(QSize(100,100))
-        self.VDown.clicked.connect(lambda: self.handlePause(ui_tts_conn))
+        self.VDown.clicked.connect(lambda: self.handleVDown(ui_tts_conn))
         self.VDown.setStyleSheet(ButtonInfo)
         
         self.Hand_On = QPushButton("", self)
@@ -218,7 +219,7 @@ class App(QWidget):
         self.Hand_On.setCheckable(True)
         self.Hand_On.setIcon(QIcon(QPixmap("Hand_On.png")))
         self.Hand_On.setIconSize(QSize(75,75))
-        self.Hand_On.clicked.connect(self.IconToggle2)
+        self.Speech.clicked.connect(lambda: self.handlePose(ButtonInfo, ButtonInfo_toggled, speechbutton1, ui_tts_conn))
         self.Hand_On.setStyleSheet(ButtonInfo)
     
         self.wifi = QPushButton("",self)
@@ -226,26 +227,18 @@ class App(QWidget):
         self.wifi.setStyleSheet("background:rgb(0,0,0,0);")
         self.wifi.setIconSize(QSize(50,50))
 
-    def IconToggle(self):
-        if self.Speech.isChecked():
-            self.Speech.setIcon(QIcon(QPixmap("Mic_On.png")))
-            self.Speech.setIconSize(QSize(75,75))
-            #self.handleSpeech have the mic turned on 
-        else:
-            self.Speech.setIcon(QIcon(QPixmap("Mic_Off.png")))
-            self.Speech.setIconSize(QSize(75,75))
-            #Turn off the mic with function 
 
-    def IconToggle2(self):
-        if self.Hand_On.isChecked():
-            self.Hand_On.setIcon(QIcon(QPixmap("Hand_Off.png")))
-            self.Hand_On.setIconSize(QSize(75,75))
-            #self.handleSpeech have the mic turned on 
-        else:
-            self.Hand_On.setIcon(QIcon(QPixmap("Hand_On.png")))
-            self.Hand_On.setIconSize(QSize(75,75))
-            #Turn off the mic with function 
-        
+
+    def keyPressEvent(self, event):
+        key = event.key()
+        if key == QtCore.Qt.Key_Q: 
+            self.ui_tts_conn.put('start')
+        elif key == QtCore.Qt.Key_W:
+            self.ui_tts_conn.put('pause')
+        elif key == QtCore.Qt.Key_E:
+            self.ui_tts_conn.put('stop')
+        elif key == QtCore.Qt.Key_A:
+            self.Speech.click()
 
     def closeEvent(self, event):
         self.thread.stop()
@@ -374,23 +367,47 @@ class App(QWidget):
                 else:
                     pixmap.save(fileName)
         
-    def handleSpeech(self, ButtonInfo, ButtonInfo1, speechbutton1, ui_tts_conn):
+    def handleSpeech(self, ButtonInfo, ButtonInfo_toggled, speechbutton1, ui_tts_conn):
         if self.Speech.isChecked():
-            self.Speech.setStyleSheet(ButtonInfo1)
+            self.Speech.setIcon(QIcon(QPixmap("Mic_On.png")))
+            self.Speech.setIconSize(QSize(75,75))
+            #self.handleSpeech have the mic turned on 
             speechbutton1.send(1)
             ui_tts_conn.put('pause')
+            self.Speech.setStyleSheet(ButtonInfo_toggled)
             # ui_tts_conn.send('pause')
         else:
-            self.Speech.setStyleSheet(ButtonInfo)
+            self.Speech.setIcon(QIcon(QPixmap("Mic_Off.png")))
+            self.Speech.setIconSize(QSize(75,75))
+            #Turn off the mic with function 
             speechbutton1.send(0)
             ui_tts_conn.put('start')
+            self.Speech.setStyleSheet(ButtonInfo)
             # ui_tts_conn.send('unpause')
+
+    def handlePose(self, ButtonInfo, ButtonInfo_toggled, conn2, ui_tts_conn):
+        if self.Hand_On.isChecked():
+            self.Hand_On.setIcon(QIcon(QPixmap("Hand_Off.png")))
+            self.Hand_On.setIconSize(QSize(75,75))
+            conn2.send(0)
+            self.Hand_On.setStyleSheet(ButtonInfo_toggled)
+        else:
+            self.Hand_On.setIcon(QIcon(QPixmap("Hand_On.png")))
+            self.Hand_On.setIconSize(QSize(75,75))
+            conn2.send(1)
+            self.Hand_On.setStyleSheet(ButtonInfo)
 
     def handlePlay(self, ui_tts_conn):
         ui_tts_conn.put('start')
 
     def handlePause(self, ui_tts_conn):
         ui_tts_conn.put('pause')
+
+    def handleVUp(self, ui_tts_conn):
+        ui_tts_conn.put('louder')
+
+    def handleVDown(self, ui_tts_conn):
+        ui_tts_conn.put('softer')
 
     def openWindow(self):
         self.window = QtWidgets.QMainWindow()
