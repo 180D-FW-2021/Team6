@@ -129,11 +129,11 @@ def unpause(started, paused):
 
 def volumeUp():
     cur_vol = pygame.mixer.music.get_volume()
-    pygame.mixer.set_volume(cur_vol + 0.1)
+    pygame.mixer.music.set_volume(cur_vol + 0.5)
 
 def volumeDown():
     cur_vol = pygame.mixer.music.get_volume()
-    pygame.mixer.set_volume(cur_vol - 0.1)
+    pygame.mixer.music.set_volume(cur_vol - 0.5)
 
 def calibrate(r, m):
     with m as source: 
