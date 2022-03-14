@@ -219,7 +219,7 @@ class App(QWidget):
         self.Hand_On.setCheckable(True)
         self.Hand_On.setIcon(QIcon(QPixmap("Hand_On.png")))
         self.Hand_On.setIconSize(QSize(75,75))
-        self.Speech.clicked.connect(lambda: self.handlePose(ButtonInfo, ButtonInfo_toggled, speechbutton1, ui_tts_conn))
+        self.Hand_On.clicked.connect(lambda: self.handlePose(ButtonInfo, ButtonInfo_toggled, speechbutton1, ui_tts_conn))
         self.Hand_On.setStyleSheet(ButtonInfo)
     
         self.wifi = QPushButton("",self)
