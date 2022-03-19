@@ -63,7 +63,7 @@ def handle_data(handle, value):
 
 
 def main():
-    os.system('sudo pigpiod')
+    #os.system('sudo pigpiod')
     adapter.start()
     while(1):
         try:
