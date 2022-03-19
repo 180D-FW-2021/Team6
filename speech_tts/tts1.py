@@ -21,30 +21,11 @@ from queue import Empty
 
 # https://stackoverflow.com/questions/58630700/utilising-the-pygame-mixer-music-get-endevent
 
-'''
-engine = None
-already_processed = None
-r = None
-m = None
-outfile = None
-sampleText = "hi hi"
-'''
 
 MUSIC_END = pygame.USEREVENT+1
 
 def init():
     global engine, r, m, screen 
-    ''' 
-    if sys.platform == "win32":
-        pass
-        # import pycaw
-    elif sys.platform == "darwin":
-        import applescript
-    elif sys.platform == "linux":
-        import alsaaudio
-    else:
-        print("volume controls not supported")
-    '''
     pygame.mixer.init()
     engine = pyttsx3.init()
     r = sr.Recognizer()
@@ -73,25 +54,6 @@ def process_text(textqueue, audioqueue):
             print(count)
 
 def read(audioqueue, started, paused, play_count):
-    '''
-    if len(config.outfile) > 0 and config.play_count < config.count:
-        if not pygame.mixer.music.get_busy(): # don't restart if file is already playing
-            try:
-                print(config.play_count, config.count)
-                pygame.mixer.music.load(config.outfile[config.play_count])
-                pygame.mixer.music.play()
-                config.started = True
-                config.paused = False
-                # pygame.mixer.music.set_endevent(MUSIC_END)
-            except pygame.error as e:
-                if e.args[0] is not None:
-                    if 'No file' in e.args[0]:
-                        print('temp.wav not yet outputted. try again later')
-                    else:
-                        print(e.message)
-                else:
-                    print(str(e))
-    '''
     if not pygame.mixer.music.get_busy():
         if config.started and config.paused:
             paused = False
@@ -204,23 +166,6 @@ def tts(commandsqueue, audioqueue, tts_ui_conn):
     play_count = 0
     init()
     while (1):
-        ''' 
-        try:
-            for event in pygame.event.get():
-                if event.type == MUSIC_END:
-                    print('music end event')
-                    #if pygame.mixer.music.get_endevent():
-                    #    print('music end event')
-                    play_count += 1
-                    pygame.mixer.music.set_endevent()
-            if pygame.mixer.music.get_endevent():
-                print('music end event')
-                play_count += 1
-                # pygame.mixer.music.set_endevent()
-            pass
-        except pygame.error as e:
-            print(e.args[0])
-        '''
         try:
             cmd = commandsqueue.get()
             print(cmd, config.started, config.paused)
