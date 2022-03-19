@@ -56,7 +56,7 @@ def test_text_recognition(textqueue):
 
 
 def image_test(textqueue):
-    config.start=1
+    config.start = 1
     print('image test start')
     img = cv2.imread("image1.jpg", cv2.IMREAD_COLOR)
     config.ImagePass = "image1.jpg"
@@ -91,7 +91,7 @@ def image_test(textqueue):
 
 def on_connect(client, userdata, flags, rc):
     print("Connection returned result: "+str(rc))
-    #config.sampleText.append('Connected')
+    # config.sampleText.append('Connected')
     #config.start = 1
     config.connect = 1
     # Subscribing in on_connect() means that if we lose the connection and
@@ -135,36 +135,38 @@ def on_disconnect(client, userdata, rc):
 
 def on_message(client, userdata, message):
     textqueue = userdata['textqueue']
-    f = open('receive.jpg', 'wb')
+    f = open('temp/receive.jpg', 'wb')
     f.write(message.payload)
     f.close()
     print('image received')
 
-    img = cv2.imread("receive.jpg", cv2.IMREAD_COLOR)
+    img = cv2.imread("temp/receive.jpg", cv2.IMREAD_COLOR)
     img = cv2.rotate(img, cv2.cv2.ROTATE_90_CLOCKWISE)
-    cv2.imwrite("receive.jpg", img)
-    
+    cv2.imwrite("temp/receive.jpg", img)
+
     # New code: preprocessing if receive.jpg is the unpreprocessed image
     gray_image = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    cv2.imwrite("gray.jpg", gray_image)
-    #2 BW
+    cv2.imwrite("temp/gray.jpg", gray_image)
+    # 2 BW
     #thresh, self.bw = cv2.threshold(self.gray_image, 210, 230, cv2.THRESH_BINARY)
-    thresh, bw = cv2.threshold(gray_image, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
-    cv2.imwrite("bw_image.jpg", bw)
+    thresh, bw = cv2.threshold(
+        gray_image, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+    cv2.imwrite("temp/bw_image.jpg", bw)
 
     ##########
-    #3 GRAY-> BLACK and WHITE -> DILATION
+    # 3 GRAY-> BLACK and WHITE -> DILATION
     bt = cv2.bitwise_not(bw)
-    kernel = np.ones((1,1),np.uint8) #increase 2,2 to 3,3 for stronger dilation, 5,5 is too
+    # increase 2,2 to 3,3 for stronger dilation, 5,5 is too
+    kernel = np.ones((1, 1), np.uint8)
     bt = cv2.dilate(bt, kernel, iterations=1)
     bt = cv2.bitwise_not(bt)
 
     text = pytesseract.image_to_string(bt)
-    
+
     #text = pytesseract.image_to_string(img)
     # print(text)
     process_text_mutex.acquire()
-    config.ImagePass = "receive.jpg"
+    config.ImagePass = "temp/receive.jpg"
     #config.sampleText = text
     config.start = 1
     config.sampleText.append(text)
@@ -198,7 +200,7 @@ def on_message(client, userdata, message):
 #     config.sampleText.append('Image Received')
 #     config.start = 1
 #     img = cv2.imread("receive.jpg", cv2.IMREAD_COLOR)
-# 
+#
 #     process_text_mutex.acquire()
 #     # Old preprocessing Midterm version
 #     '''gray_image = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -210,7 +212,7 @@ def on_message(client, userdata, message):
 #     nn = cv2.medianBlur(gray_image, 3)
 #     cv2.imwrite("receive.jpg_processed.jpg", nn)
 #     text = pytesseract.image_to_string(nn)'''
-#     
+#
 #     # Post midterm Feb 11, more accuracy
 #     gray_image = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 #     thresh, bw = cv2.threshold(gray_image, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
@@ -220,20 +222,20 @@ def on_message(client, userdata, message):
 #     bt = cv2.bitwise_not(bt)
 #     cv2.imwrite("receive.jpg_processed.jpg", bt)
 #     text = pytesseract.image_to_string(bt)
-# 
+#
 #     process_text_mutex.acquire()
 #     config.ImagePass = "receive.jpg"
 #     #config.sampleText = text
 #     config.start = 1
 #     config.sampleText.append(text)
-# 
+#
 #     process_text_mutex.release()
 #     speechtts.process_text()
 
 
 def text_recognition(textqueue):
     # 1. create a client instance.
-    client_userdata = {'textqueue':textqueue}
+    client_userdata = {'textqueue': textqueue}
     client = mqtt.Client(userdata=client_userdata)
     # add additional clientoptions (security, certifications, etc.)
     # many default options should be good to start off.
@@ -264,19 +266,21 @@ def text_recognition(textqueue):
     client.disconnect()
 
 
-def ui_image_test(textqueue,audioqueue):
+def ui_image_test(textqueue, audioqueue):
     import config
     t1 = threading.Thread(target=ui.setup, args=(textqueue,))
     t2 = threading.Thread(target=image_test, args=(textqueue,))
-    t3 = threading.Thread(target=speechtts.process_text, args=(textqueue, audioqueue))
+    t3 = threading.Thread(target=speechtts.process_text,
+                          args=(textqueue, audioqueue))
 
     t1.start()
     t2.start()
     t3.start()
-    
+
     t1.join()
     t2.join()
     t3.join()
+
 
 def posefeed(imagequeue):
     import config
@@ -286,25 +290,29 @@ def posefeed(imagequeue):
         except Empty as e:
             pass
 
+
 def ui_comms_process(textqueue, audioqueue, conn2, speechbutton1, ui_tts_conn):
     import config
-    t1 = threading.Thread(target=ui.setup, args=(textqueue, conn2, speechbutton1, ui_tts_conn))
+    t1 = threading.Thread(target=ui.setup, args=(
+        textqueue, conn2, speechbutton1, ui_tts_conn))
     t2 = threading.Thread(target=text_recognition, args=(textqueue,))
-    t3 = threading.Thread(target=speechtts.process_text, args=(textqueue, audioqueue))
+    t3 = threading.Thread(target=speechtts.process_text,
+                          args=(textqueue, audioqueue))
 
     t1.start()
     t2.start()
     t3.start()
-    
+
     t1.join()
     t2.join()
     t3.join()
+
 
 def main():
     # global config.sampleText
 
     # pose.setup()
-    
+
     print('setup')
 
     path = os.getcwd()
@@ -318,29 +326,30 @@ def main():
     speechbutton1, speechbutton2 = Pipe()
     ui_tts_conn, tts_ui_conn = Pipe()
 
-    p2 = Process(target=speechtts.speech, args=(commandsqueue,speechbutton2))
+    p2 = Process(target=speechtts.speech, args=(commandsqueue, speechbutton2))
     # send commands to tts
 
     p3 = Process(target=pose.main, args=(commandsqueue, path, conn1))
     # send commands to tts
 
-    p4 = Process(target=speechtts.tts, args=(commandsqueue, audioqueue, tts_ui_conn))
+    p4 = Process(target=speechtts.tts, args=(
+        commandsqueue, audioqueue, tts_ui_conn))
     # read from textqueue
     # get sigs from pose and speech
 
-    p7 = Process(target=ui_comms_process, args=(textqueue, audioqueue, conn2, speechbutton1, \
-                    commandsqueue))
+    p7 = Process(target=ui_comms_process, args=(textqueue, audioqueue, conn2, speechbutton1,
+                                                commandsqueue))
 
-    print( 'processes start')
+    print('processes start')
 
     p7.start()
 
     p2.start()
-    print( '2')
+    print('2')
     p3.start()
     print('3')
     p4.start()
-    print( '4')
+    print('4')
 
     p7.join()
     p2.join()
