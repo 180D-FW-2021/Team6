@@ -13,9 +13,10 @@ from PyQt5.QtCore import *
 from UI.Instructions_Pop_up import Ui_MainWindow
 #from UI.Instructions_Pop_up import *
 
-from PIL import Image 
+from PIL import Image
 import PIL
-import os 
+import os
+
 
 class VideoThread(QThread):
     change_pixmap_signal = pyqtSignal(np.ndarray)
@@ -52,7 +53,7 @@ class App(QWidget):
 
         timer = QTimer(self)
         timer.timeout.connect(self.updateScreen)
-        #timer.timeout.connect(self.wifiupdate)
+        # timer.timeout.connect(self.wifiupdate)
         timer.start(10)
 
         # Image area ---------------------------------------------------
@@ -60,7 +61,7 @@ class App(QWidget):
         self.labelImage.setGeometry(QtCore.QRect(1000, 100, 711, 470))
         self.labelImage.setFrameShape(QtWidgets.QFrame.WinPanel)
         self.labelImage.setText("")
-        #self.labelImage.rotate(-90)
+        # self.labelImage.rotate(-90)
         self.labelImage.setScaledContents(True)
         self.labelImage.setStyleSheet("background:rgb(218,217,212);")
         # Image area ---------------------------------------------------
@@ -165,10 +166,11 @@ class App(QWidget):
         self.Speech.resize(75, 75)
         self.Speech.setFont(QFont('Times', 15))
         self.Speech.setCheckable(True)
-        
-        self.Speech.clicked.connect(lambda: self.handleSpeech(ButtonInfo, ButtonInfo_toggled, speechbutton1, ui_tts_conn))
-        self.Speech.setIcon(QIcon(QPixmap("Mic_Off.png")))
-        self.Speech.setIconSize(QSize(75,75))
+
+        self.Speech.clicked.connect(lambda: self.handleSpeech(
+            ButtonInfo, ButtonInfo_toggled, speechbutton1, ui_tts_conn))
+        self.Speech.setIcon(QIcon(QPixmap("Assets/Mic_Off.png")))
+        self.Speech.setIconSize(QSize(75, 75))
         self.Speech.setStyleSheet(ButtonInfo)
 
         self.Play = QPushButton("", self)
@@ -176,8 +178,8 @@ class App(QWidget):
         self.Play.setGeometry(QtCore.QRect(600, 820, 250, 41))
         self.Play.resize(75, 75)
         self.Play.setFont(QFont('times', 15))
-        self.Play.setIcon(QIcon(QPixmap("Start.png")))
-        self.Play.setIconSize(QSize(50,50))
+        self.Play.setIcon(QIcon(QPixmap("Assets/Start.png")))
+        self.Play.setIconSize(QSize(50, 50))
         self.Play.clicked.connect(lambda: self.handlePlay(ui_tts_conn))
         self.Play.setStyleSheet(ButtonInfo)
 
@@ -186,8 +188,8 @@ class App(QWidget):
         self.Pause.setGeometry(QtCore.QRect(600, 900, 250, 41))
         self.Pause.resize(75, 75)
         self.Pause.setFont(QFont('times', 15))
-        self.Pause.setIcon(QIcon(QPixmap("Pause.png")))
-        self.Pause.setIconSize(QSize(50,50))
+        self.Pause.setIcon(QIcon(QPixmap("Assets/Pause.png")))
+        self.Pause.setIconSize(QSize(50, 50))
         self.Pause.clicked.connect(lambda: self.handlePause(ui_tts_conn))
         self.Pause.setStyleSheet(ButtonInfo)
 
@@ -196,8 +198,8 @@ class App(QWidget):
         self.VUp.setGeometry(QtCore.QRect(700, 820, 250, 41))
         self.VUp.resize(75, 75)
         self.VUp.setFont(QFont('times', 15))
-        self.VUp.setIcon(QIcon(QPixmap("Volume_Up.png")))
-        self.VUp.setIconSize(QSize(100,100))
+        self.VUp.setIcon(QIcon(QPixmap("Assets/Volume_Up.png")))
+        self.VUp.setIconSize(QSize(100, 100))
         self.VUp.clicked.connect(lambda: self.handleVUp(ui_tts_conn))
         self.VUp.setStyleSheet(ButtonInfo)
 
@@ -206,32 +208,31 @@ class App(QWidget):
         self.VDown.setGeometry(QtCore.QRect(700, 900, 250, 41))
         self.VDown.resize(75, 75)
         self.VDown.setFont(QFont('times', 15))
-        self.VDown.setIcon(QIcon(QPixmap("Volume_Down.png")))
-        self.VDown.setIconSize(QSize(100,100))
+        self.VDown.setIcon(QIcon(QPixmap("Assets/Volume_Down.png")))
+        self.VDown.setIconSize(QSize(100, 100))
         self.VDown.clicked.connect(lambda: self.handleVDown(ui_tts_conn))
         self.VDown.setStyleSheet(ButtonInfo)
-        
+
         self.Hand_On = QPushButton("", self)
         self.Hand_On.setObjectName("Gesture Recognition")
         self.Hand_On.setGeometry(QtCore.QRect(700, 740, 250, 41))
         self.Hand_On.resize(75, 75)
         self.Hand_On.setFont(QFont('Times', 15))
         self.Hand_On.setCheckable(True)
-        self.Hand_On.setIcon(QIcon(QPixmap("Hand_On.png")))
-        self.Hand_On.setIconSize(QSize(75,75))
-        self.Hand_On.clicked.connect(lambda: self.handlePose(ButtonInfo, ButtonInfo_toggled, speechbutton1, ui_tts_conn))
+        self.Hand_On.setIcon(QIcon(QPixmap("Assets/Hand_On.png")))
+        self.Hand_On.setIconSize(QSize(75, 75))
+        self.Hand_On.clicked.connect(lambda: self.handlePose(
+            ButtonInfo, ButtonInfo_toggled, speechbutton1, ui_tts_conn))
         self.Hand_On.setStyleSheet(ButtonInfo)
-    
-        self.wifi = QPushButton("",self)
+
+        self.wifi = QPushButton("", self)
         self.wifi.setGeometry(QtCore.QRect(30, 50, 50, 50))
         self.wifi.setStyleSheet("background:rgb(0,0,0,0);")
-        self.wifi.setIconSize(QSize(50,50))
-
-
+        self.wifi.setIconSize(QSize(50, 50))
 
     def keyPressEvent(self, event):
         key = event.key()
-        if key == QtCore.Qt.Key_Q: 
+        if key == QtCore.Qt.Key_Q:
             self.ui_tts_conn.put('start')
         elif key == QtCore.Qt.Key_W:
             self.ui_tts_conn.put('pause')
@@ -239,6 +240,24 @@ class App(QWidget):
             self.ui_tts_conn.put('stop')
         elif key == QtCore.Qt.Key_A:
             self.Speech.click()
+        elif key == QtCore.Qt.Key_Up:
+            self.ui_tts_conn.put('louder')
+        elif key == QtCore.Qt.Key_Down:
+            self.ui_tts_conn.put('softer')
+        elif key == QtCore.Qt.Key_S:
+            self.Hand_On.click()
+        elif key == QtCore.Qt.Key_Escape:
+            self.Instructions.click()
+        elif key == QtCore.Qt.Key_Z:
+            self.Loadimage.click()
+        elif key == QtCore.Qt.Key_X:
+            self.Clear.click()
+        elif key == QtCore.Qt.Key_C:
+            self.Save.click()
+        elif key == QtCore.Qt.Key_V:
+            self.SaveImage.click()
+        elif key == QtCore.Qt.Key_Space:
+            self.Run.click()
 
     def closeEvent(self, event):
         self.thread.stop()
@@ -274,22 +293,24 @@ class App(QWidget):
         if self.fileName:
             print(self.fileName)
             self.img = cv2.imread(self.fileName)
-            #1 GRAY
+            # 1 GRAY
             self.gray_image = cv2.cvtColor(self.img, cv2.COLOR_BGR2GRAY)
             cv2.imwrite("gray.jpg", self.gray_image)
-            #2 BW
+            # 2 BW
             #thresh, self.bw = cv2.threshold(self.gray_image, 210, 230, cv2.THRESH_BINARY)
-            thresh, self.bw = cv2.threshold(self.gray_image, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+            thresh, self.bw = cv2.threshold(
+                self.gray_image, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
             cv2.imwrite("bw_image.jpg", self.bw)
 
             ##########
-            #3 GRAY-> BLACK and WHITE -> DILATION
+            # 3 GRAY-> BLACK and WHITE -> DILATION
             self.bt = cv2.bitwise_not(self.bw)
-            kernel = np.ones((1,1),np.uint8) #increase 2,2 to 3,3 for stronger dilation, 5,5 is too
+            # increase 2,2 to 3,3 for stronger dilation, 5,5 is too
+            kernel = np.ones((1, 1), np.uint8)
             self.bt = cv2.dilate(self.bt, kernel, iterations=1)
             self.bt = cv2.bitwise_not(self.bt)
 
-            #4 GRAY-> BLACK and WHITE -> DILATION -> NOISE REMOVAL
+            # 4 GRAY-> BLACK and WHITE -> DILATION -> NOISE REMOVAL
             '''
             kernel = np.ones((1, 1), np.uint8)
             self.nn = cv2.dilate(self.bt, kernel, iterations=1)
@@ -297,7 +318,7 @@ class App(QWidget):
             self.nn = cv2.morphologyEx(self.nn, cv2.MORPH_CLOSE, kernel)
             self.nn = cv2.medianBlur(self.nn, 3)'''
 
-            #5 Noise removal and erosion
+            # 5 Noise removal and erosion
             # GRAY > BLACK WHITE#2 > NOISE REMOVAL
             '''kernel = np.ones((1, 1), np.uint8)
             self.nn = cv2.dilate(self.bw, kernel, iterations=1)
@@ -362,24 +383,24 @@ class App(QWidget):
             pixmap = self.labelImage.pixmap()
             if pixmap is not None and fileName:
                 if not split_tup[1]:
-                    jpg ='.jpg'
-                    pixmap.save(fileName+jpg)    
+                    jpg = '.jpg'
+                    pixmap.save(fileName+jpg)
                 else:
                     pixmap.save(fileName)
-        
+
     def handleSpeech(self, ButtonInfo, ButtonInfo_toggled, speechbutton1, ui_tts_conn):
         if self.Speech.isChecked():
-            self.Speech.setIcon(QIcon(QPixmap("Mic_On.png")))
-            self.Speech.setIconSize(QSize(75,75))
-            #self.handleSpeech have the mic turned on 
+            self.Speech.setIcon(QIcon(QPixmap("Assets/Mic_On.png")))
+            self.Speech.setIconSize(QSize(75, 75))
+            # self.handleSpeech have the mic turned on
             speechbutton1.send(1)
             # ui_tts_conn.put('pause')
             self.Speech.setStyleSheet(ButtonInfo_toggled)
             # ui_tts_conn.send('pause')
         else:
-            self.Speech.setIcon(QIcon(QPixmap("Mic_Off.png")))
-            self.Speech.setIconSize(QSize(75,75))
-            #Turn off the mic with function 
+            self.Speech.setIcon(QIcon(QPixmap("Assets/Mic_Off.png")))
+            self.Speech.setIconSize(QSize(75, 75))
+            # Turn off the mic with function
             speechbutton1.send(0)
             # ui_tts_conn.put('start')
             self.Speech.setStyleSheet(ButtonInfo)
@@ -387,12 +408,12 @@ class App(QWidget):
 
     def handlePose(self, ButtonInfo, ButtonInfo_toggled, conn2, ui_tts_conn):
         if self.Hand_On.isChecked():
-            self.Hand_On.setIcon(QIcon(QPixmap("Hand_Off.png")))
+            self.Hand_On.setIcon(QIcon(QPixmap("Assets/Hand_Off.png")))
             self.Hand_On.setIconSize(QSize(75,75))
             self.conn2.send(0)
             self.Hand_On.setStyleSheet(ButtonInfo_toggled)
         else:
-            self.Hand_On.setIcon(QIcon(QPixmap("Hand_On.png")))
+            self.Hand_On.setIcon(QIcon(QPixmap("Assets/Hand_On.png")))
             self.Hand_On.setIconSize(QSize(75,75))
             self.conn2.send(1)
             self.Hand_On.setStyleSheet(ButtonInfo)
@@ -427,10 +448,9 @@ class App(QWidget):
             self.setImage(config.ImagePass)
             config.start = 0
         if config.connect == 1:
-            self.wifi.setIcon(QIcon(QPixmap("Wifi_On.png")))
+            self.wifi.setIcon(QIcon(QPixmap("Assets/Wifi_On.png")))
         else:
-            self.wifi.setIcon(QIcon(QPixmap("Wifi_Off.png")))
-        
+            self.wifi.setIcon(QIcon(QPixmap("Assets/Wifi_Off.png")))
 
     def listToString(self, s):
 
@@ -446,10 +466,12 @@ def setup(textqueue, conn2, speechbutton1, ui_tts_conn):
     a = App(conn2, textqueue, speechbutton1, ui_tts_conn)
     c = a.palette()
     #c.setColor(a.backgroundRole(), Qt.gray)
-    c.setBrush(QPalette.Background,QBrush(QPixmap("BackgroundImage.png")))
+    c.setBrush(QPalette.Background, QBrush(
+        QPixmap("Assets/BackgroundImage.png")))
     a.setPalette(c)
     a.show()
     sys.exit(app.exec_())
+
 
     # app.exec_()
     # sys.exit()
@@ -458,7 +480,8 @@ if __name__ == "__main__":
     a = App()
     c = a.palette()
     #c.setColor(a.backgroundRole(), QColor(26, 62, 88))
-    c.setBrush(QPalette.Background,QBrush(QPixmap("BackgroundImage.png")))
+    c.setBrush(QPalette.Background, QBrush(
+        QPixmap("Assets/BackgroundImage.png")))
     a.setPalette(c)
     a.show()
     #a.setText("THis is a test")
