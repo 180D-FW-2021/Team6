@@ -52,7 +52,7 @@ int a=0; // count
 void setup() {
 
  bleService = new BLEService("180F");
- gestureCharacteristic = new BLEByteCharacteristic("2A19", BLERead | BLEWrite);
+ gestureCharacteristic = new BLEByteCharacteristic("84dfdb6a-8a51-8afd-5425-17c7f94d8199", BLERead | BLENotify);
 
  Serial.begin(9600);
   if (!IMU.begin()) {
@@ -70,7 +70,7 @@ void setup() {
   bleService->addCharacteristic(*gestureCharacteristic);
   BLE.addService(*bleService);
   // start advertising
-  BLE.setLocalName("yschul");
+  BLE.setLocalName("arduino");
   // set the initial value for the characeristic:
   gestureCharacteristic->writeValue(0);
   // start advertising
@@ -128,7 +128,7 @@ void loop() {
     
           // sum up the absolutes
           float aSum = fabs(aX) + fabs(aY) + fabs(aZ);
-    
+          Serial.println(aSum);
           // check if it's above the threshold
           if (aSum >= accelerationThreshold) {
             // reset the sample read count
@@ -207,7 +207,7 @@ void loop() {
              }
             
            }
-            delay(1000); 
+            delay(2000); 
             // Loop through the output tensor values from the model
             Serial.print(GESTURES[1]); // GESTURES[0] = flex
             Serial.print(": ");
