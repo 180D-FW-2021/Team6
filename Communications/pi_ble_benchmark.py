@@ -64,8 +64,9 @@ def handle_data(handle, value):
 
 def main():
     adapter.start()
-    start = time.time()
+    
     while(1):
+        start = time.time()
         try:
             device = adapter.connect('91:2a:70:0e:41:e3')
             device.subscribe("84dfdb6a-8a51-8afd-5425-17c7f94d8199",callback=handle_data)
