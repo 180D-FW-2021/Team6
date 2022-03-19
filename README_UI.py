@@ -31,7 +31,6 @@ class VideoThread(QThread):
         while self._run_flag:
             cv_img = self.conn2.recv()
             self.change_pixmap_signal.emit(cv_img)
-        pass
 
     def stop(self):
         """Sets run flag to False and waits for thread to finish"""
@@ -49,6 +48,7 @@ class App(QWidget):
         self.textqueue = textqueue
         self.ui_tts_conn = ui_tts_conn
         self.speechbutton1 = speechbutton1
+        self.conn2 = conn2
 
         timer = QTimer(self)
         timer.timeout.connect(self.updateScreen)
@@ -262,7 +262,7 @@ class App(QWidget):
         return QPixmap.fromImage(p)
 
     def close(self):
-        cv2.destroyAllWindows()
+        self.thread.stop
         exit()
 
     def getImage(self):
@@ -373,7 +373,7 @@ class App(QWidget):
             self.Speech.setIconSize(QSize(75,75))
             #self.handleSpeech have the mic turned on 
             speechbutton1.send(1)
-            ui_tts_conn.put('pause')
+            # ui_tts_conn.put('pause')
             self.Speech.setStyleSheet(ButtonInfo_toggled)
             # ui_tts_conn.send('pause')
         else:
@@ -381,7 +381,7 @@ class App(QWidget):
             self.Speech.setIconSize(QSize(75,75))
             #Turn off the mic with function 
             speechbutton1.send(0)
-            ui_tts_conn.put('start')
+            # ui_tts_conn.put('start')
             self.Speech.setStyleSheet(ButtonInfo)
             # ui_tts_conn.send('unpause')
 
@@ -389,12 +389,12 @@ class App(QWidget):
         if self.Hand_On.isChecked():
             self.Hand_On.setIcon(QIcon(QPixmap("Hand_Off.png")))
             self.Hand_On.setIconSize(QSize(75,75))
-            conn2.send(0)
+            self.conn2.send(0)
             self.Hand_On.setStyleSheet(ButtonInfo_toggled)
         else:
             self.Hand_On.setIcon(QIcon(QPixmap("Hand_On.png")))
             self.Hand_On.setIconSize(QSize(75,75))
-            conn2.send(1)
+            self.conn2.send(1)
             self.Hand_On.setStyleSheet(ButtonInfo)
 
     def handlePlay(self, ui_tts_conn):

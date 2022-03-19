@@ -141,12 +141,15 @@ def calibrate(r, m):
 
 def speech(commandsqueue, speechbutton2):
     r = sr.Recognizer()
+    unpause_after = None
     while (1):
         val = speechbutton2.recv()
         if val == 1:
+            unpause_after = True
+            commandsqueue.put('pause')
             with sr.Microphone() as source:
                 print("say something!")
-                time.sleep(1)
+                # time.sleep(1)
                 audio = r.listen(source)
             try:
                 speech = r.recognize_google(audio)
@@ -156,16 +159,22 @@ def speech(commandsqueue, speechbutton2):
 
                 if "play" in speech:
                     commandsqueue.put('start')
+                    unpause_after = False
                     # pygame.mixer.music.set_endevent(MUSIC_END)
                 elif "stop" in speech:
                     commandsqueue.put('stop')
+                    unpause_after = False
                 elif "pause" in speech:
                     commandsqueue.put('pause')
+                    unpause_after = False
                 elif "volume" in speech:
                     if "up" in speech:
                         commandsqueue.put('louder')
+                        unpause_after = True
                     if 'down' in speech:
                         commandsqueue.put('softer')
+                        unpause_after = True
+
                 # TODO speeding up/down currently not implemented, 
                 #      complications with the time required to resample the wav file
                     '''
@@ -183,6 +192,10 @@ def speech(commandsqueue, speechbutton2):
                     print("Google Speech Recognition could not understand audio")
             except sr.RequestError as e:
                     print("Error; {0}".format(e))
+        elif val == 0 and unpause_after:
+            commandsqueue.put('start')
+
+
 
 
 def tts(commandsqueue, audioqueue, tts_ui_conn):
@@ -223,6 +236,9 @@ def tts(commandsqueue, audioqueue, tts_ui_conn):
                 volumeDown()
            
         except Empty as e:
+            pass
+
+        except pygame.error as e:
             pass
 
         if config.started and not config.paused and not pygame.mixer.music.get_busy():

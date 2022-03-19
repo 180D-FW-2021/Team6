@@ -102,14 +102,16 @@ def main(commandsqueue, path, conn1):
 
     while True:
         '''
-        val = conn1.recv()
-        if val == 0:
-            cap.release()
-            while(conn1.recv() != 1):
-                print('pose off')
-            cap = cv.VideoCapture(cap_device)
+        if conn1.poll(0):
+            val = conn1.recv()
+            if val == 0:
+                cap.release()
+                while(1):
+                    if conn1.poll(0):
+                        if conn1.recv() == 1:
+                            break
+                cap = cv.VideoCapture(cap_device)
         '''
-
         fps = cvFpsCalc.get()
 
         # Process Key (ESC: end) #################################################
