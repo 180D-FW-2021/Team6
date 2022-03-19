@@ -57,7 +57,6 @@ def test_text_recognition(textqueue):
 
 def image_test(textqueue):
     config.start = 1
-    print('image test start')
     img = cv2.imread("image1.jpg", cv2.IMREAD_COLOR)
     config.ImagePass = "image1.jpg"
     text = pytesseract.image_to_string(img)
@@ -313,11 +312,7 @@ def main():
 
     # pose.setup()
 
-    print('setup')
-
     path = os.getcwd()
-
-    print('after setup')
 
     textqueue = Queue()
     commandsqueue = Queue()
@@ -340,16 +335,11 @@ def main():
     p7 = Process(target=ui_comms_process, args=(textqueue, audioqueue, conn2, speechbutton1,
                                                 commandsqueue))
 
-    print('processes start')
-
     p7.start()
 
     p2.start()
-    print('2')
     p3.start()
-    print('3')
     p4.start()
-    print('4')
 
     p7.join()
     p2.join()
