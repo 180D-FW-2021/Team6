@@ -240,6 +240,24 @@ class App(QWidget):
             self.ui_tts_conn.put('stop')
         elif key == QtCore.Qt.Key_A:
             self.Speech.click()
+        elif key == QtCore.Qt.Key_Up:
+            self.ui_tts_conn.put('louder')
+        elif key == QtCore.Qt.Key_Down:
+            self.ui_tts_conn.put('softer')
+        elif key == QtCore.Qt.Key_S:
+            self.Hand_On.click()
+        elif key == QtCore.Qt.Key_Escape:
+            self.Instructions.click()
+        elif key == QtCore.Qt.Key_Z:
+            self.Loadimage.click()
+        elif key == QtCore.Qt.Key_X:
+            self.Clear.click()
+        elif key == QtCore.Qt.Key_C:
+            self.Save.click()
+        elif key == QtCore.Qt.Key_V:
+            self.SaveImage.click()
+        elif key == QtCore.Qt.Key_Space:
+            self.Run.click()
 
     def closeEvent(self, event):
         self.thread.stop()
